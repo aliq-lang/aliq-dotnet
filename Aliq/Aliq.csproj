@@ -11,6 +11,7 @@
     <PackageTags>LINQ</PackageTags>
     <Authors>Sergey Shandar</Authors>
     <Company>Sergey Shandar</Company>
+    <Version>$(APPVEYOR_BUILD_VERSION)</Version>
   </PropertyGroup>
 
 </Project>
