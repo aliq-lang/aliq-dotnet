@@ -9,6 +9,8 @@
     <RepositoryUrl>https://github.com/sergey-shandar/aliq</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>LINQ</PackageTags>
+    <Authors>Sergey Shandar</Authors>
+    <Company>Sergey Shandar</Company>
   </PropertyGroup>
 
 </Project>
