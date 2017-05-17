@@ -4,6 +4,6 @@ dotnet: 1.0.4
 dist: trusty
 solution: Aliq.sln
 install:
-- dotnet install Aliq.sln
+- dotnet restore Aliq.sln
 script:
 - dotnet build Aliq.sln
