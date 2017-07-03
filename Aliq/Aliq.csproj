@@ -11,11 +11,11 @@
     <PackageTags>LINQ</PackageTags>
     <Authors>Sergey Shandar</Authors>
     <Company>Sergey Shandar</Company>
-    <Version>0</Version>
+    <Version>0.7</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DagVer" Version="0.1.0.35" />
+    <PackageReference Include="DagVer" Version="0.1.0.37" />
   </ItemGroup>
 
 </Project>
