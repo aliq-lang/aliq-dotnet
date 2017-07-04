@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard1.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Copyright>Sergey Shandar</Copyright>
     <PackageLicenseUrl>https://github.com/sergey-shandar/aliq/blob/master/LICENSE</PackageLicenseUrl>
@@ -12,10 +12,12 @@
     <Authors>Sergey Shandar</Authors>
     <Company>Sergey Shandar</Company>
     <Version>0.7</Version>
+    <Description>Abstract Language Integrated Query</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DagVer" Version="0.1.0.37" />
+    <PackageReference Include="DagVer" Version="0.1.0.37" PrivateAssets="All" />
+    <PackageReference Include="NumericPolicies" Version="0.0.12.28199" />
   </ItemGroup>
 
 </Project>

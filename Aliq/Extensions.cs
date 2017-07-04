@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NumericPolicies;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Aliq
@@ -27,8 +29,11 @@ namespace Aliq
             this Bag<I> input, Expression<Func<I, T>> map)
             => input.SelectMany(i => new[] { map.Compile()(i) });
 
+        public static Bag<T> Where<T>(this Bag<T> input, Expression<Func<T, bool>> p)
+            => input.SelectMany(v => p.Compile()(v) ? new[] { v } : Enumerable.Empty<T>());
+
         public static Bag<T> Aggregate<T>(this Bag<T> input, Expression<Func<T, T, T>> reduce)
-            => input.GroupBy(_ => Void.Instance, reduce);
+            => input.GroupBy(_ => default(Void), reduce);
 
         public static Bag<T> Aggregate<T>(
             this Bag<T> input, T value, Expression<Func<T, T, T>> reduce)
@@ -50,23 +55,89 @@ namespace Aliq
         public static Bag<bool> Any<T>(this Bag<T> input)
             => input.Any(_ => true);
 
-        public static Bag<T> BagAverage<P, T>(this P _, Bag<T> input)
+        public static Bag<Numeric<T, P>> NumericBag<T, P>(this Bag<T> input, P _ = default(P))
+            where P : struct, INumericPolicy<T>
+            => input.Select(v => v.Numeric<T, P>());
+
+        public static Bag<Numeric<decimal, DecimalPolicy>> NumericBag(this Bag<decimal> input)
+            => input.NumericBag(default(DecimalPolicy));
+
+        public static Bag<Numeric<double, DoublePolicy>> NumericBag(this Bag<double> input)
+            => input.NumericBag(default(DoublePolicy));
+
+        public static Bag<Numeric<int, IntPolicy>> NumericBag(this Bag<int> input)
+            => input.NumericBag(default(IntPolicy));
+
+        public static Bag<Numeric<long, LongPolicy>> NumericBag(this Bag<long> input)
+            => input.NumericBag(default(LongPolicy));
+
+        public static Bag<MomentList1<T, P>> MomentList1<T, P>(this Bag<Numeric<T, P>> input)
             where P : struct, INumericPolicy<T>
             => input
-                .Select(v => Tuple.Create(1, v))
-                .Aggregate((a, b) => Tuple.Create(a.Item1 + b.Item1, new P().Add(a.Item2, b.Item2)))
-                .Select(v => new P().Div(v.Item2, new P().FromLong(v.Item1)));
+                .Select(v => v.MomentList1())
+                .Aggregate(0L.ToNumeric<T, P>().MomentList1(), (a, b) => a.Add(b));
+
+        public static Bag<T> Average<T, P>(this Bag<Numeric<T, P>> input)
+            where P : struct, INumericPolicy<T>
+            => input
+                .MomentList1()
+                .Where(v => v.Count != 0)
+                .Select(v => v.Average);
+
+        public static T? Nullable<T>(this T value)
+            where T : struct
+            => new T?(value);
+
+        public static Bag<T> NotNullValues<T>(this Bag<T?> input)
+            where T : struct
+            => input.SelectMany(v => v == null ? Enumerable.Empty<T>() : new[] { v.Value });
+
+        public static Bag<Numeric<T, P>> NumericBag<T, P>(this Bag<T?> input, P _ = default(P))
+            where P : struct, INumericPolicy<T>
+            where T : struct
+            => input.NotNullValues().NumericBag<T, P>();
+
+        public static Bag<Numeric<decimal, DecimalPolicy>> NumericBag(this Bag<decimal?> input)
+            => input.NumericBag(default(DecimalPolicy));
+
+        public static Bag<Numeric<double, DoublePolicy>> NumericBag(this Bag<double?> input)
+            => input.NumericBag(default(DoublePolicy));
+
+        public static Bag<Numeric<int, IntPolicy>> NumericBag(this Bag<int?> input)
+            => input.NumericBag(default(IntPolicy));
+
+        public static Bag<Numeric<long, LongPolicy>> NumericBag(this Bag<long?> input)
+            => input.NumericBag(default(LongPolicy));
+
+        public static Bag<T?> NullableAverage<T, P>(this Bag<Numeric<T, P>> input)
+            where P : struct, INumericPolicy<T>
+            where T : struct
+            => input
+                .MomentList1()
+                .Select(v => v.Count != 0 ? v.Average.Nullable() : null);
 
         public static Bag<decimal> Average(this Bag<decimal> input)
-            => NumericPolicy.Instance.BagAverage(input);
+            => input.NumericBag().Average();
 
         public static Bag<double> Average(this Bag<double> input)
-            => NumericPolicy.Instance.BagAverage(input);
+            => input.NumericBag().Average();
 
         public static Bag<int> Average(this Bag<int> input)
-            => NumericPolicy.Instance.BagAverage(input);
+            => input.NumericBag().Average();
 
         public static Bag<long> Average(this Bag<long> input)
-            => NumericPolicy.Instance.BagAverage(input);
+            => input.NumericBag().Average();
+
+        public static Bag<decimal?> Average(this Bag<decimal?> input)
+            => input.NumericBag().NullableAverage();
+
+        public static Bag<double?> Average(this Bag<double?> input)
+            => input.NumericBag().NullableAverage();
+
+        public static Bag<int?> Average(this Bag<int?> input)
+            => input.NumericBag().NullableAverage();
+
+        public static Bag<long?> Average(this Bag<long?> input)
+            => input.NumericBag().NullableAverage();
     }
 }
