@@ -50,17 +50,23 @@ namespace Aliq
         public static Bag<bool> Any<T>(this Bag<T> input)
             => input.Any(_ => true);
 
-        public static Bag<T> BagAverage<P, T>(this P policy, Bag<T> input)
+        public static Bag<T> BagAverage<P, T>(this P _, Bag<T> input)
             where P : struct, INumericPolicy<T>
             => input
                 .Select(v => Tuple.Create(1, v))
                 .Aggregate((a, b) => Tuple.Create(a.Item1 + b.Item1, new P().Add(a.Item2, b.Item2)))
                 .Select(v => new P().Div(v.Item2, new P().FromLong(v.Item1)));
 
-        public static Bag<decimal> Average<T>(this Bag<decimal> input)
+        public static Bag<decimal> Average(this Bag<decimal> input)
             => NumericPolicy.Instance.BagAverage(input);
 
-        public static Bag<double> Average<T>(this Bag<double> input)
+        public static Bag<double> Average(this Bag<double> input)
+            => NumericPolicy.Instance.BagAverage(input);
+
+        public static Bag<int> Average(this Bag<int> input)
+            => NumericPolicy.Instance.BagAverage(input);
+
+        public static Bag<long> Average(this Bag<long> input)
             => NumericPolicy.Instance.BagAverage(input);
     }
 }
