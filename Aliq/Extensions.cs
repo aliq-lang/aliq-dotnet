@@ -65,11 +65,14 @@ namespace Aliq
         public static Bag<Numeric<double, DoublePolicy>> NumericBag(this Bag<double> input)
             => input.NumericBag(default(DoublePolicy));
 
-        public static Bag<Numeric<int, IntPolicy>> NumericBag(this Bag<int> input)
-            => input.NumericBag(default(IntPolicy));
+        public static Bag<Numeric<int, Int32Policy>> NumericBag(this Bag<int> input)
+            => input.NumericBag(default(Int32Policy));
 
-        public static Bag<Numeric<long, LongPolicy>> NumericBag(this Bag<long> input)
-            => input.NumericBag(default(LongPolicy));
+        public static Bag<Numeric<long, Int64Policy>> NumericBag(this Bag<long> input)
+            => input.NumericBag(default(Int64Policy));
+
+        public static Bag<Numeric<float, SinglePolicy>> NumericBag(this Bag<float> input)
+            => input.NumericBag(default(SinglePolicy));
 
         public static Bag<MomentList1<T, P>> MomentList1<T, P>(this Bag<Numeric<T, P>> input)
             where P : struct, INumericPolicy<T>
@@ -103,11 +106,14 @@ namespace Aliq
         public static Bag<Numeric<double, DoublePolicy>> NumericBag(this Bag<double?> input)
             => input.NumericBag(default(DoublePolicy));
 
-        public static Bag<Numeric<int, IntPolicy>> NumericBag(this Bag<int?> input)
-            => input.NumericBag(default(IntPolicy));
+        public static Bag<Numeric<int, Int32Policy>> NumericBag(this Bag<int?> input)
+            => input.NumericBag(default(Int32Policy));
 
-        public static Bag<Numeric<long, LongPolicy>> NumericBag(this Bag<long?> input)
-            => input.NumericBag(default(LongPolicy));
+        public static Bag<Numeric<long, Int64Policy>> NumericBag(this Bag<long?> input)
+            => input.NumericBag(default(Int64Policy));
+
+        public static Bag<Numeric<float, SinglePolicy>> NumericBag(this Bag<float?> input)
+            => input.NumericBag(default(SinglePolicy));
 
         public static Bag<T?> NullableAverage<T, P>(this Bag<Numeric<T, P>> input)
             where P : struct, INumericPolicy<T>
@@ -128,6 +134,9 @@ namespace Aliq
         public static Bag<long> Average(this Bag<long> input)
             => input.NumericBag().Average();
 
+        public static Bag<float> Average(this Bag<float> input)
+            => input.NumericBag().Average();
+
         public static Bag<decimal?> Average(this Bag<decimal?> input)
             => input.NumericBag().NullableAverage();
 
@@ -138,6 +147,9 @@ namespace Aliq
             => input.NumericBag().NullableAverage();
 
         public static Bag<long?> Average(this Bag<long?> input)
+            => input.NumericBag().NullableAverage();
+
+        public static Bag<float?> Average(this Bag<float?> input)
             => input.NumericBag().NullableAverage();
     }
 }

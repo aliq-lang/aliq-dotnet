@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="DagVer" Version="0.1.0.37" PrivateAssets="All" />
-    <PackageReference Include="NumericPolicies" Version="0.0.12.28199" />
+    <PackageReference Include="NumericPolicies" Version="0.0.13.61781" />
   </ItemGroup>
 
 </Project>
