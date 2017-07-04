@@ -2,6 +2,8 @@
 
 Abstract Language Integrated Query
 
+[![NuGet](https://img.shields.io/nuget/v/Aliq.svg)](https://www.nuget.org/packages/Aliq/)
+
 ## Scalable Over Technologies
 
 ## For Developers
