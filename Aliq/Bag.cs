@@ -40,7 +40,7 @@ namespace Aliq
             R Visit(DisjointUnion<T> disjointUnion);
             R Visit(ExternalInput<T> externalInput);
             R Visit(Const<T> const_);
-            R Visit<K>(GroupBy<T, K> groupBy);
+            R Visit<K, V>(GroupBy<T, K, V> groupBy);
             R Visit<A, B>(Product<T, A, B> product);
         }
 

@@ -11,18 +11,50 @@ namespace Aliq
         public static Const<T> ToConstBag<T>(this T value)
             => new Const<T>(value);
 
-        public static GroupBy<T, K> GroupBy<T, K>(
-            this Bag<T> input,
+        public static GroupBy<T, K, V> GroupBy<T, K, V>(
+            this Bag<(K, V)> input,
+            Expression<Func<V, V, V>> reduce,
+            Expression<Func<(K, V), IEnumerable<T>>> getResult,
+            IEqualityComparer<K> comparer)
+            => new GroupBy<T, K, V>(input, reduce, getResult, comparer);
+
+        /*
+        public static Bag<T> GroupBy<T, K, I>(
+            this Bag<I> input,
+            Expression<Func<I, K>> getKey,
+            Expression<Func<I, T>> getValue,
+            Expression<Func<T, T, T>> reduce,
+            IEqualityComparer<K> comparer)
+        {
+            var getKeyCompiled = getKey.Compiled();
+            var getValueCompiled = getValue.Compiled();
+            return input.GroupBy(
+                i => (getKeyCompiled.Compiled(i), getValueCompiled.Compiled(i)),
+                reduce,
+                v => v,
+                comparer);
+        }
+
+        public static Bag<T> GroupBy<T, K>(
+            this Bag<(K, IT> input,
             Expression<Func<T, K>> getKey,
             Expression<Func<T, T, T>> reduce,
             IEqualityComparer<K> comparer)
-            => new GroupBy<T, K>(input, getKey, reduce, comparer);
+        {
+            var getKeyCompiled = getKey.Compiled();
+            return input.GroupBy(
+                i => (getKeyCompiled.Compiled(i), i),
+                reduce,
+                v => v,
+                comparer);
+        }        
 
-        public static GroupBy<T, K> GroupBy<T, K>(
+        public static Bag<T> GroupBy<T, K>(
             this Bag<T> input,
             Expression<Func<T, K>> getKey,
             Expression<Func<T, T, T>> reduce)
             => input.GroupBy(getKey, reduce, EqualityComparer<K>.Default);
+        */
 
         public static DisjointUnion<T> DisjointUnion<T>(this Bag<T> a, Bag<T> b)
             => new DisjointUnion<T>(a, b);
@@ -33,10 +65,17 @@ namespace Aliq
 
         public static Bag<T> Select<T, I>(
             this Bag<I> input, Expression<Func<I, T>> map)
-            => input.SelectMany(i => new[] { map.Compile()(i) });
+        {
+            var mapCompiled = map.Compiled();
+            return input.SelectMany(i => new[] { mapCompiled.Compiled(i) });
+        }
 
         public static Bag<T> Where<T>(this Bag<T> input, Expression<Func<T, bool>> p)
-            => input.SelectMany(v => p.Compile()(v) ? new[] { v } : Enumerable.Empty<T>());
+        {
+            var mapCompiled = p.Compiled();
+            return input.SelectMany(v => 
+                mapCompiled.Compiled(v) ? new[] { v } : Enumerable.Empty<T>());
+        }
 
         public static Bag<T> Aggregate<T>(this Bag<T> input, Expression<Func<T, T, T>> reduce)
             => input.GroupBy(_ => default(Void), reduce);

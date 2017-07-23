@@ -4,25 +4,31 @@ using System.Linq.Expressions;
 
 namespace Aliq
 {
-    public sealed class GroupBy<T, K> : Bag<T>
+    public sealed class GroupBy<T, K, V> : Bag<T>
     {
-        public Bag<T> Input { get; }
+        public Bag<(K, V)> Input { get; }
 
         public IEqualityComparer<K> Comparer { get; }
 
-        public Expression<Func<T, K>> GetKey { get; }
+        /// <summary>
+        /// Reduce values.
+        /// </summary>
+        public CompiledExpression<Func<V, V, V>> Reduce { get; }
 
-        public Expression<Func<T, T, T>> Reduce { get; }
+        /// <summary>
+        /// Convert a key/value to a final result.
+        /// </summary>
+        public CompiledExpression<Func<(K, V), IEnumerable<T>>> GetResult { get; }
 
         public GroupBy(
-            Bag<T> input,            
-            Expression<Func<T, K>> getKey,
-            Expression<Func<T, T, T>> reduce,
+            Bag<(K, V)> input,
+            Expression<Func<V, V, V>> reduce,
+            Expression<Func<(K, V), IEnumerable<T>>> getResult,
             IEqualityComparer<K> comparer)
         {
             Input = input;
-            GetKey = getKey;
-            Reduce = reduce;
+            Reduce = reduce.Compiled();
+            GetResult = getResult.Compiled();
             Comparer = comparer;
         }
 

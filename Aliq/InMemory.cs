@@ -26,10 +26,9 @@ namespace Aliq
 
             public IEnumerable<T> Visit<I>(SelectMany<T, I> selectMany)
             {
-                var func = selectMany.Func.Compile();
                 return InMemory
                     .Get(selectMany.Input)
-                    .SelectMany(func);
+                    .SelectMany(selectMany.Func.Compiled);
             }
 
             public IEnumerable<T> Visit(DisjointUnion<T> disjointUnion)
@@ -47,21 +46,24 @@ namespace Aliq
                 yield return const_.Value;
             }
 
-            public IEnumerable<T> Visit<K>(GroupBy<T, K> groupBy)
+            public IEnumerable<T> Visit<K, I>(GroupBy<T, K, I> groupBy)
             {
-                var reduce = groupBy.Reduce.Compile();
+                
+                var reduce = groupBy.Reduce.Compiled;
                 return InMemory
                     .Get(groupBy.Input)
                     .GroupBy(
-                        groupBy.GetKey.Compile(),
-                        (key, list) => list.Aggregate(reduce));
+                        groupBy.GetKey.Compiled,
+                        groupBy.GetElement.Compiled,
+                        (key, list) => list.Aggregate(reduce),
+                        groupBy.Comparer);
             }
 
             public IEnumerable<T> Visit<A, B>(Product<T, A, B> product)            
             {
                 var a = InMemory.Get(product.InputA);
                 var b = InMemory.Get(product.InputB);
-                var p = product.Func.Compile();
+                var p = product.Func.Compiled;
                 return a.SelectMany(ai => b.SelectMany(bi => p(ai, bi)));
             }
 
