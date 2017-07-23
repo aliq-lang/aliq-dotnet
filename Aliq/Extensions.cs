@@ -14,9 +14,15 @@ namespace Aliq
         public static GroupBy<T, K> GroupBy<T, K>(
             this Bag<T> input,
             Expression<Func<T, K>> getKey,
-            Expression<Func<T, T, T>> reduce)
-            => new GroupBy<T, K>(input, getKey, reduce);
+            Expression<Func<T, T, T>> reduce,
+            IEqualityComparer<K> comparer)
+            => new GroupBy<T, K>(input, getKey, reduce, comparer);
 
+        public static GroupBy<T, K> GroupBy<T, K>(
+            this Bag<T> input,
+            Expression<Func<T, K>> getKey,
+            Expression<Func<T, T, T>> reduce)
+            => input.GroupBy(getKey, reduce, EqualityComparer<K>.Default);
 
         public static DisjointUnion<T> DisjointUnion<T>(this Bag<T> a, Bag<T> b)
             => new DisjointUnion<T>(a, b);
@@ -208,10 +214,31 @@ namespace Aliq
         public static NumberOf<T> NumberOf<T>(this T value)
             => value.NumberOf(1);
 
-        public static Bag<T> Distinct<T>(this Bag<T> input)
+        public static Bag<NumberOf<T>> ToNumberOf<T>(this Bag<T> input, long count = 1)
+            => input.Select(v => v.NumberOf<T>(count));
+
+        public static Bag<NumberOf<T>> Group<T>(
+            this Bag<NumberOf<T>> input, IEqualityComparer<T> comparer)
+            => input.GroupBy(v => v.Value, (a, b) => a.Add(b.Count), comparer);
+
+        public static Bag<T> Distinct<T>(this Bag<T> input, IEqualityComparer<T> comparer)
             => input
-                .Select(v => v.NumberOf())
-                .GroupBy(v => v.Value, (a, b) => a.Add(b.Count))
+                .ToNumberOf()
+                .Group(comparer)
                 .Select(v => v.Value);
+
+        public static Bag<T> Distinct<T>(this Bag<T> input)
+            => input.Distinct(EqualityComparer<T>.Default);
+
+        public static Bag<T> Except<T>(
+            this Bag<T> input, Bag<T> b, IEqualityComparer<T> comparer)
+            => input
+                .ToNumberOf()
+                .DisjointUnion(b.ToNumberOf(-1))
+                .Group(comparer)
+                .SelectMany(v => v.Repeat());
+
+        public static Bag<T> Except<T>(this Bag<T> input, Bag<T> b)
+            => input.Except(b, EqualityComparer<T>.Default);
     }
 }

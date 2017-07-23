@@ -1,4 +1,6 @@
-﻿namespace Aliq
+﻿using System.Linq;
+
+namespace Aliq
 {
     public abstract class Bag
     {
@@ -8,6 +10,9 @@
         }
 
         public abstract R Accept<R>(IVisitor<R> visitor);
+
+        public static Bag<T> Empty<T>()
+            => false.ToConstBag().SelectMany(v => Enumerable.Empty<T>());
     }
 
     public abstract class Bag<T> : Bag
