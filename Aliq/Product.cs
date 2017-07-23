@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Aliq
@@ -9,9 +10,12 @@ namespace Aliq
 
         public Bag<B> InputB { get; }
 
-        public Expression<Func<A, B, T>> Func { get; }
+        public Expression<Func<A, B, IEnumerable<T>>> Func { get; }
 
-        public Product(Bag<A> inputA, Bag<B> inputB, Expression<Func<A, B, T>> func)
+        public Product(
+            Bag<A> inputA,
+            Bag<B> inputB,
+            Expression<Func<A, B, IEnumerable<T>>> func)
         {
             InputA = inputA;
             InputB = inputB;

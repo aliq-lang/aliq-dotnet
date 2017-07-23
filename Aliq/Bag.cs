@@ -45,5 +45,9 @@ namespace Aliq
         }
 
         public abstract R Accept<R>(IVisitor<R> visitor);
+
+        internal interface IVisitor
+        {
+        }
     }
 }
