@@ -96,7 +96,7 @@ namespace XUnitTest
             var gNew = inMemory.Get(g);
             Assert.Equal(1, gNew.Count());
             var item = gNew.First();
-            Assert.Equal(14, item);
+            Assert.Equal(15, item);
         }
 
         [Fact]
