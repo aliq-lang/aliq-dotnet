@@ -1,5 +1,5 @@
 using Aliq;
-using System;
+using System.Linq;
 using Xunit;
 
 namespace XUnitTest
@@ -31,7 +31,7 @@ namespace XUnitTest
         {
             // logic
             var a = new ExternalInput<string>();
-            var g = a.GroupBy(key => 0, (ai, bi) => ai + bi);
+            var g = a.Aggregate((ai, bi) => ai + bi);
 
             // data
             var aTable = new[] { "Hello", "world", "!" };
@@ -43,7 +43,10 @@ namespace XUnitTest
             inMemory.SetInput(a, aTable);
 
             // get
-            var gNew = inMemory.Get(g);           
+            var gNew = inMemory.Get(g);
+            Assert.Equal(1, gNew.Count());
+            var item = gNew.First();
+            Assert.Equal("Hellpworld!".Length, item.Length);
         }
     }
 }

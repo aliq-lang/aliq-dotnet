@@ -1,35 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace Aliq
 {
-    public sealed class GroupBy<T, K, V> : Bag<T>
+    public sealed class GroupBy<T, I> : Bag<T>
     {
-        public Bag<(K, V)> Input { get; }
-
-        public IEqualityComparer<K> Comparer { get; }
+        public Bag<(string, I)> Input { get; }
 
         /// <summary>
         /// Reduce values.
         /// </summary>
-        public CompiledExpression<Func<V, V, V>> Reduce { get; }
+        public Func<I, I, I> Reduce { get; }
 
         /// <summary>
         /// Convert a key/value to a final result.
         /// </summary>
-        public CompiledExpression<Func<(K, V), IEnumerable<T>>> GetResult { get; }
+        public Func<(string, I), IEnumerable<T>> GetResult { get; }
 
         public GroupBy(
-            Bag<(K, V)> input,
-            Expression<Func<V, V, V>> reduce,
-            Expression<Func<(K, V), IEnumerable<T>>> getResult,
-            IEqualityComparer<K> comparer)
+            Bag<(string, I)> input,
+            Func<I, I, I> reduce,
+            Func<(string, I), IEnumerable<T>> getResult)
         {
             Input = input;
-            Reduce = reduce.Compiled();
-            GetResult = getResult.Compiled();
-            Comparer = comparer;
+            Reduce = reduce;
+            GetResult = getResult;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)

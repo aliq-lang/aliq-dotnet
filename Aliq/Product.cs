@@ -10,16 +10,16 @@ namespace Aliq
 
         public Bag<B> InputB { get; }
 
-        public CompiledExpression<Func<A, B, IEnumerable<T>>> Func { get; }
+        public Func<A, B, IEnumerable<T>> Func { get; }
 
         public Product(
             Bag<A> inputA,
             Bag<B> inputB,
-            Expression<Func<A, B, IEnumerable<T>>> func)
+            Func<A, B, IEnumerable<T>> func)
         {
             InputA = inputA;
             InputB = inputB;
-            Func = func.Compiled();
+            Func = func;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
