@@ -11,45 +11,111 @@ namespace Aliq
         public static Const<T> ToConstBag<T>(this T value)
             => new Const<T>(value);
 
-        public static GroupBy<T, K> GroupBy<T, K>(
+        public static IEnumerable<T> CreateEnumerable<T>(this T value)
+        {
+            yield return value;
+        }
+
+        public static GroupBy<T, I> GroupBy<T, I>(
+            this Bag<(string, I)> input,
+            Func<I, I, I> reduce,
+            Func<(string, I), IEnumerable<T>> getResult)
+            => new GroupBy<T, I>(input, reduce, getResult);
+
+        public static Bag<T> GroupBy<T, I, V>(
+            this Bag<I> input,
+            Func<I, string> getKey,
+            Func<I, V> getElement,
+            Func<V, V, V> reduce,
+            Func<(string, V), IEnumerable<T>> getResult)
+            => input
+                .Select(v => (getKey(v), getElement(v)))
+                .GroupBy(reduce, getResult);
+
+        public static Bag<(string, T)> GroupBy<T, I>(
+            this Bag<I> input,
+            Func<I, string> getKey,
+            Func<I, T> getElement,
+            Func<T, T, T> reduce)
+            => input.GroupBy(getKey, getElement, reduce, CreateEnumerable);
+
+        public static Bag<(string, T)> GroupBy<T>(
+            this Bag<T> input,
+            Func<T, string> getKey,
+            Func<T, T, T> reduce)
+            => input.GroupBy(getKey, v => v, reduce);
+
+        /*
+        public static Bag<T> GroupBy<T, K, I>(
+            this Bag<I> input,
+            Expression<Func<I, K>> getKey,
+            Expression<Func<I, T>> getValue,
+            Expression<Func<T, T, T>> reduce,
+            IEqualityComparer<K> comparer)
+        {
+            var getKeyCompiled = getKey.Compiled();
+            var getValueCompiled = getValue.Compiled();
+            return input.GroupBy(
+                i => (getKeyCompiled.Compiled(i), getValueCompiled.Compiled(i)),
+                reduce,
+                v => v,
+                comparer);
+        }
+
+        public static Bag<T> GroupBy<T, K>(
+            this Bag<(K, IT> input,
+            Expression<Func<T, K>> getKey,
+            Expression<Func<T, T, T>> reduce,
+            IEqualityComparer<K> comparer)
+        {
+            var getKeyCompiled = getKey.Compiled();
+            return input.GroupBy(
+                i => (getKeyCompiled.Compiled(i), i),
+                reduce,
+                v => v,
+                comparer);
+        }        
+
+        public static Bag<T> GroupBy<T, K>(
             this Bag<T> input,
             Expression<Func<T, K>> getKey,
             Expression<Func<T, T, T>> reduce)
-            => new GroupBy<T, K>(input, getKey, reduce);
-
+            => input.GroupBy(getKey, reduce, EqualityComparer<K>.Default);
+        */
 
         public static DisjointUnion<T> DisjointUnion<T>(this Bag<T> a, Bag<T> b)
             => new DisjointUnion<T>(a, b);
 
         public static SelectMany<T, I> SelectMany<T, I>(
-            this Bag<I> input, Expression<Func<I, IEnumerable<T>>> map)
+            this Bag<I> input, Func<I, IEnumerable<T>> map)
             => new SelectMany<T, I>(input, map);
 
         public static Bag<T> Select<T, I>(
-            this Bag<I> input, Expression<Func<I, T>> map)
-            => input.SelectMany(i => new[] { map.Compile()(i) });
+            this Bag<I> input, Func<I, T> map)
+            => input.SelectMany(i => new[] { map(i) });
 
-        public static Bag<T> Where<T>(this Bag<T> input, Expression<Func<T, bool>> p)
-            => input.SelectMany(v => p.Compile()(v) ? new[] { v } : Enumerable.Empty<T>());
+        public static Bag<T> Where<T>(this Bag<T> input, Func<T, bool> p)
+            => input.SelectMany(v => 
+                p(v) ? new[] { v } : Enumerable.Empty<T>());
 
-        public static Bag<T> Aggregate<T>(this Bag<T> input, Expression<Func<T, T, T>> reduce)
-            => input.GroupBy(_ => default(Void), reduce);
+        public static Bag<T> Aggregate<T>(this Bag<T> input, Func<T, T, T> reduce)
+            => input.GroupBy(_ => string.Empty, reduce).Select(v => v.Item2);
 
         public static Bag<T> Aggregate<T>(
-            this Bag<T> input, T value, Expression<Func<T, T, T>> reduce)
+            this Bag<T> input, T value, Func<T, T, T> reduce)
             => value.ToConstBag().DisjointUnion(input).Aggregate(reduce);
 
         public static Bag<R> Aggregate<T, R>(
             this Bag<T> input,
             T value,
-            Expression<Func<T, T, T>> reduce,
-            Expression<Func<T, R>> map)
+            Func<T, T, T> reduce,
+            Func<T, R> map)
             => input.Aggregate(value, reduce).Select(map);
 
-        public static Bag<bool> All<T>(this Bag<T> input, Expression<Func<T, bool>> map)
+        public static Bag<bool> All<T>(this Bag<T> input, Func<T, bool> map)
             => input.Select(map).Aggregate(true, (a, b) => a && b);
 
-        public static Bag<bool> Any<T>(this Bag<T> input, Expression<Func<T, bool>> map)
+        public static Bag<bool> Any<T>(this Bag<T> input, Func<T, bool> map)
             => input.Select(map).Aggregate(false, (a, b) => a || b);
 
         public static Bag<bool> Any<T>(this Bag<T> input)
@@ -95,7 +161,7 @@ namespace Aliq
             where T : struct
             => input.SelectMany(v => v == null ? Enumerable.Empty<T>() : new[] { v.Value });
 
-        public static Bag<T> NotNullValues<T, I>(this Bag<I> input, Expression<Func<I, T?>> map)
+        public static Bag<T> NotNullValues<T, I>(this Bag<I> input, Func<I, T?> map)
              where T : struct
             => input.Select(map).NotNullValues();
 
@@ -137,43 +203,43 @@ namespace Aliq
             => input.NotNullValues().NumericBag().NullableAverage();
 
         public static Bag<decimal> Average<T>(
-            this Bag<T> input, Expression<Func<T, decimal>> map)
+            this Bag<T> input, Func<T, decimal> map)
             => input.Select(map).NumericBag().Average();
 
         public static Bag<double> Average<T>(
-            this Bag<T> input, Expression<Func<T, double>> map)
+            this Bag<T> input, Func<T, double> map)
             => input.Select(map).NumericBag().Average();
 
         public static Bag<int> Average<T>(
-            this Bag<T> input, Expression<Func<T, int>> map)
+            this Bag<T> input, Func<T, int> map)
             => input.Select(map).NumericBag().Average();
 
         public static Bag<long> Average<T>(
-            this Bag<T> input, Expression<Func<T, long>> map)
+            this Bag<T> input, Func<T, long> map)
             => input.Select(map).NumericBag().Average();
 
         public static Bag<float> Average<T>(
-            this Bag<T> input, Expression<Func<T, float>> map)
+            this Bag<T> input, Func<T, float> map)
             => input.Select(map).NumericBag().Average();
 
         public static Bag<decimal?> Average<T>(
-            this Bag<T> input, Expression<Func<T, decimal?>> map)
+            this Bag<T> input, Func<T, decimal?> map)
             => input.NotNullValues(map).NumericBag().NullableAverage();
 
         public static Bag<double?> Average<T>(
-            this Bag<T> input, Expression<Func<T, double?>> map)
+            this Bag<T> input, Func<T, double?> map)
             => input.NotNullValues(map).NumericBag().NullableAverage();
 
         public static Bag<int?> Average<T>(
-            this Bag<T> input, Expression<Func<T, int?>> map)
+            this Bag<T> input, Func<T, int?> map)
             => input.NotNullValues(map).NumericBag().NullableAverage();
 
         public static Bag<long?> Average<T>(
-            this Bag<T> input, Expression<Func<T, long?>> map)
+            this Bag<T> input, Func<T, long?> map)
             => input.NotNullValues(map).NumericBag().NullableAverage();
 
         public static Bag<float?> Average<T>(
-            this Bag<T> input, Expression<Func<T, float?>> map)
+            this Bag<T> input, Func<T, float?> map)
             => input.NotNullValues(map).NumericBag().NullableAverage();
 
         public static Bag<bool> Contains<T>(Bag<T> input, T value)
@@ -191,8 +257,7 @@ namespace Aliq
         public static Bag<long> Count<T>(this Bag<T> input)
             => input.Select(_ => 1L).Sum();
 
-        public static Bag<long> Count<T>(
-            this Bag<T> input, Expression<Func<T, bool>> p)
+        public static Bag<long> Count<T>(this Bag<T> input, Func<T, bool> p)
             => input.Where(p).Count();
 
         public static Bag<T> DefaultIfEmpty<T>(this Bag<T> input, T value = default(T))
@@ -208,10 +273,33 @@ namespace Aliq
         public static NumberOf<T> NumberOf<T>(this T value)
             => value.NumberOf(1);
 
-        public static Bag<T> Distinct<T>(this Bag<T> input)
+        public static Bag<NumberOf<T>> ToNumberOf<T>(this Bag<T> input, long count = 1)
+            => input.Select(v => v.NumberOf<T>(count));
+
+        public static Bag<NumberOf<T>> Group<T>(
+            this Bag<NumberOf<T>> input, Func<T, string> getKey)
             => input
-                .Select(v => v.NumberOf())
-                .GroupBy(v => v.Value, (a, b) => a.Add(b.Count))
+                .GroupBy(v => getKey(v.Value), (a, b) => a.Add(b.Count))
+                .Select(v => v.Item2);
+
+        public static Bag<T> Distinct<T>(this Bag<T> input, Func<T, string> getKey)
+            => input
+                .ToNumberOf()
+                .Group(getKey)
                 .Select(v => v.Value);
+
+        public static Bag<string> Distinct(this Bag<string> input)
+            => input.Distinct(v => v);
+
+        public static Bag<T> Except<T>(
+            this Bag<T> input, Bag<T> b, Func<T, string> getKey)
+            => input
+                .ToNumberOf()
+                .DisjointUnion(b.ToNumberOf(-1))
+                .Group(getKey)
+                .SelectMany(v => v.Repeat());
+
+        public static Bag<string> Except(this Bag<string> input, Bag<string> b)
+            => input.Except(b, v => v);
     }
 }

@@ -1,24 +1,30 @@
 ﻿using System;
-using System.Linq.Expressions;
+using System.Collections.Generic;
 
 namespace Aliq
 {
-    public sealed class GroupBy<T, K> : Bag<T>
+    public sealed class GroupBy<T, I> : Bag<T>
     {
-        public Bag<T> Input { get; }
+        public Bag<(string, I)> Input { get; }
 
-        public Expression<Func<T, K>> GetKey { get; }
+        /// <summary>
+        /// Reduce values.
+        /// </summary>
+        public Func<I, I, I> Reduce { get; }
 
-        public Expression<Func<T, T, T>> Reduce { get; }
+        /// <summary>
+        /// Convert a key/value to a final result.
+        /// </summary>
+        public Func<(string, I), IEnumerable<T>> GetResult { get; }
 
         public GroupBy(
-            Bag<T> input,
-            Expression<Func<T, K>> getKey,
-            Expression<Func<T, T, T>> reduce)
+            Bag<(string, I)> input,
+            Func<I, I, I> reduce,
+            Func<(string, I), IEnumerable<T>> getResult)
         {
             Input = input;
-            GetKey = getKey;
             Reduce = reduce;
+            GetResult = getResult;
         }
 
         public override R Accept<R>(IVisitor<R> visitor)
