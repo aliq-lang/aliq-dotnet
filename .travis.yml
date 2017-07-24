@@ -7,3 +7,4 @@ install:
 - dotnet restore Aliq.sln
 script:
 - dotnet build Aliq.sln
+- dotnet test Aliq.sln
