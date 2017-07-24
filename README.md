@@ -4,7 +4,13 @@ Abstract Language Integrated Query
 
 [![NuGet](https://img.shields.io/nuget/v/Aliq.svg)](https://www.nuget.org/packages/Aliq/)
 
-## Scalable Over Technologies
+### Creating a Business Logic Using ALIQ
+
+Use the `Bag` type and extension methods from [Aliq\Extensions.cs](Aliq\Extensions.cs).
+
+### Creating a Back-End Which Execute the Business-Logic
+
+Implemt a `Bag<T>.IVisitor` from [Aliq\Bag.cs](Aliq\Bag.cs).
 
 ## For Developers
 
