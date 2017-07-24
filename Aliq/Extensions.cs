@@ -144,7 +144,7 @@ namespace Aliq
             where P : struct, INumericPolicy<T>
             => input
                 .Select(v => v.MomentList1())
-                .Aggregate(0L.ToNumeric<T, P>().MomentList1(), (a, b) => a.Add(b));
+                .Aggregate(0L.ToNumeric<T, P>().MomentList1(0), (a, b) => a.Add(b));
 
         public static Bag<T> Average<T, P>(this Bag<Numeric<T, P>> input)
             where P : struct, INumericPolicy<T>
