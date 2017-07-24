@@ -5,10 +5,11 @@
 ```cs
 interface IBinding
 {
-	void SetInput<T>(ExternalInput<T> input, string objectId);
-	void SetOutput<T>(Bag<T> output, string objectId);
+	void Set<T>(Bag<T> bag, string objectId);
 }
 ```
+
+Where `objectId` is a name of data object, for example a file name.
 
 ## Binding
 
