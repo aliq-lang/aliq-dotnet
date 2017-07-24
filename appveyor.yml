@@ -3,6 +3,6 @@ image: Visual Studio 2017
 before_build:
 - ps: nuget restore
 test_script:
-- ps: dotnet test Aliq.sln
+- ps: dotnet test XUnitTest/XUnitTest.csproj
 artifacts:
 - path: '**/Aliq.*.nupkg'
