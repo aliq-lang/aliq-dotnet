@@ -13,4 +13,4 @@ Where `objectId` is a name of data object, for example a file name.
 
 ## Binding
 
-A DLL should have a function `Aliq.Init(Aliq.IDataBinding binding)` which is called on each node.
+A DLL should have a function `Logic.Init(Aliq.IDataBinding binding)` which is called on each node.

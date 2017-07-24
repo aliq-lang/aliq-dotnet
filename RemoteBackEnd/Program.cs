@@ -1,20 +1,37 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.Loader;
 
 namespace RemoteBackEnd
 {
-    class Program
+    public class Program
     {
-        static int Main(string[] args)
+        public static void Main(Assembly assembly)
         {
-            if (args.Length == 0)
+            var logicType = assembly.GetType("Logic");
+            var dataBinding = new DataBinding();
+            logicType.GetMethod("Init").Invoke(null, new object[] { dataBinding });
+        }
+
+        public static int Main(string[] args)
+        {
+            try
             {
-                Console.Error.WriteLine("no arguments");
+                if (args.Length == 0)
+                {
+                    Console.Error.WriteLine("error: no arguments");
+                    return -1;
+                }
+                var dllPath = args[0];
+                var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(dllPath);
+                Main(assembly);
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
                 return -1;
             }
-            var dllName = args[0];
-            var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(dllName);
-            return 0;
         }
     }
 }
