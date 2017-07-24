@@ -7,6 +7,12 @@ namespace XUnitTest
 {
     public class InMemoryTest
     {
+        public class Store
+        {
+            public string Name;
+            public List<decimal> inventoryTotals;
+        }
+
 
         [Fact]
         public void TestSetInput()
@@ -102,25 +108,53 @@ namespace XUnitTest
         [Fact]
         public void MapReduceTest()
         {
+            //initialize stores
 
-
-            int[] numbers = { 10, 15, 20, 25, 30, 35 };
-            //List<int>
-
-            foreach (int number in numbers)
+            Store[] chain =
             {
-                int curNumber = number + 3;
-            }
+                new Store
+                {
+                    Name= "originalStore",
+                    inventoryTotals = new List<decimal>()
+                },
+                new Store()
+                {
+                    Name = "secondStore",
+                    inventoryTotals = new List<decimal>()
+        }
+            };
+
+
+
+            var result = chain.SelectMany(c => c.inventoryTotals);
 
             // logic
-            var a = new ExternalInput<int>();
+            var a = new ExternalInput<decimal>();
             var g = a.Aggregate((ai, bi) => ai + bi);
 
+            // data - populate
+            chain[0].inventoryTotals.Add((decimal)4.80);
+            chain[0].inventoryTotals.Add((decimal)8.80);
+            chain[0].inventoryTotals.Add((decimal)9.40);
+
+            chain[1].inventoryTotals.Add((decimal)5.80);
+            chain[1].inventoryTotals.Add((decimal)9.80);
+            chain[1].inventoryTotals.Add((decimal)12.40);
+
+            // back end
+            var inMemory = new InMemory();
+
+            // binding
+            inMemory.SetInput<decimal>(a, chain.SelectMany(c=>c.inventoryTotals));
+
+            // get
+            var gNew = inMemory.Get(g);
+            Assert.Equal(1, gNew.Count());
+            var item = gNew.First();
+            Assert.Equal(51, item);
 
 
-            var result = numbers.GroupBy(n => (n % 10 == 0));
-            var max = result.ElementAt(0);
-            Assert.Equal(6, numbers.Length);
+            Assert.True(true);
         }
 
         [Fact]
@@ -140,5 +174,24 @@ namespace XUnitTest
             Assert.Equal(4.0, gNew.First());
         }
 
+
+        [Fact]
+        public void WhereTest()
+        {
+            var a = new ExternalInput<string>();
+            var g = a.Where(v => (v.StartsWith("M")));
+
+            //
+            var aData = new string[] { "Mike", "Sergey", "Mandar" };
+
+            //
+            var inMemory = new InMemory();
+
+            inMemory.SetInput(a, aData);
+            var gNew = inMemory.Get(g);
+            Assert.Equal(2, gNew.Count());
+            Assert.True(gNew.Contains("Mike"));
+            Assert.True(gNew.Contains("Mandar"));
+        }
     }
 }
