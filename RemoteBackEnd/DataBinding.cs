@@ -1,6 +1,6 @@
 ﻿using Aliq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace RemoteBackEnd
 {
@@ -14,12 +14,12 @@ namespace RemoteBackEnd
             }
             if (IdToBag.ContainsKey(bagId))
             {
-                throw new System.Exception(
+                throw new Exception(
                     "two bags can't have the same name: " + bagId);
             }
             IdToBag[bagId] = bag;
             BagToId[bag] = bagId;
-            bag.Accept(new Visitor<T>(this, bagId));
+            bag.Accept(new SetVisitor<T>(this, bagId));
         }
 
         public string GetId<T>(Bag<T> bag)
@@ -34,9 +34,9 @@ namespace RemoteBackEnd
         private Dictionary<Bag, string> BagToId { get; }
             = new Dictionary<Bag, string>();
 
-        private sealed class Visitor<T> : Bag<T>.IVisitor<Aliq.Void>
+        private sealed class SetVisitor<T> : Bag<T>.IVisitor<Aliq.Void>
         {
-            public Visitor(DataBinding dataBinding, string objectId)
+            public SetVisitor(DataBinding dataBinding, string objectId)
             {
                 DataBinding = dataBinding;
                 ObjectId = objectId;
@@ -48,14 +48,14 @@ namespace RemoteBackEnd
 
             public Aliq.Void Visit<I>(SelectMany<T, I> selectMany)
             {
-                DataBinding.Set(selectMany.Input, ObjectId + "s");
+                DataBinding.Set(selectMany.Input, ObjectId + "_s");
                 return new Aliq.Void();
             }
 
             public Aliq.Void Visit(DisjointUnion<T> disjointUnion)
             {
-                DataBinding.Set(disjointUnion.InputA, ObjectId + "a");
-                DataBinding.Set(disjointUnion.InputB, ObjectId + "b");
+                DataBinding.Set(disjointUnion.InputA, ObjectId + "_a");
+                DataBinding.Set(disjointUnion.InputB, ObjectId + "_b");
                 return new Aliq.Void();
             }
 
@@ -67,14 +67,14 @@ namespace RemoteBackEnd
 
             public Aliq.Void Visit<I>(GroupBy<T, I> groupBy)
             {
-                DataBinding.Set(groupBy.Input, ObjectId + "g");
+                DataBinding.Set(groupBy.Input, ObjectId + "_g");
                 return new Aliq.Void();
             }
 
             public Aliq.Void Visit<A, B>(Product<T, A, B> product)
             {
-                DataBinding.Set(product.InputA, ObjectId + "i");
-                DataBinding.Set(product.InputB, ObjectId + "j");
+                DataBinding.Set(product.InputA, ObjectId + "_i");
+                DataBinding.Set(product.InputB, ObjectId + "_j");
                 return new Aliq.Void();
             }
         }
