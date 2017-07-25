@@ -7,13 +7,6 @@ namespace XUnitTest
 {
     public class InMemoryTest
     {
-        public class Store
-        {
-            public string Name;
-            public List<decimal> inventoryTotals;
-        }
-
-
         [Fact]
         public void TestSetInput()
         {
@@ -89,8 +82,6 @@ namespace XUnitTest
 
             // data
             double[] aTable = (new[] { 8.0, 30.0, 4.0, 18.0 });
-            var avgWithLINQ = aTable.Average();
-            Assert.Equal(15, avgWithLINQ);
 
             // back end
             var inMemory = new InMemory();
@@ -103,58 +94,6 @@ namespace XUnitTest
             Assert.Equal(1, gNew.Count());
             var item = gNew.First();
             Assert.Equal(15, item);
-        }
-
-        [Fact]
-        public void MapReduceTest()
-        {
-            //initialize stores
-
-            Store[] chain =
-            {
-                new Store
-                {
-                    Name= "originalStore",
-                    inventoryTotals = new List<decimal>()
-                },
-                new Store()
-                {
-                    Name = "secondStore",
-                    inventoryTotals = new List<decimal>()
-        }
-            };
-
-
-
-            var result = chain.SelectMany(c => c.inventoryTotals);
-
-            // logic
-            var a = new ExternalInput<decimal>();
-            var g = a.Aggregate((ai, bi) => ai + bi);
-
-            // data - populate
-            chain[0].inventoryTotals.Add((decimal)4.80);
-            chain[0].inventoryTotals.Add((decimal)8.80);
-            chain[0].inventoryTotals.Add((decimal)9.40);
-
-            chain[1].inventoryTotals.Add((decimal)5.80);
-            chain[1].inventoryTotals.Add((decimal)9.80);
-            chain[1].inventoryTotals.Add((decimal)12.40);
-
-            // back end
-            var inMemory = new InMemory();
-
-            // binding
-            inMemory.SetInput<decimal>(a, chain.SelectMany(c=>c.inventoryTotals));
-
-            // get
-            var gNew = inMemory.Get(g);
-            Assert.Equal(1, gNew.Count());
-            var item = gNew.First();
-            Assert.Equal(51, item);
-
-
-            Assert.True(true);
         }
 
         [Fact]
@@ -176,7 +115,7 @@ namespace XUnitTest
 
 
         [Fact]
-        public void WhereTest()
+        public void WhereTestString()
         {
             var a = new ExternalInput<string>();
             var g = a.Where(v => (v.StartsWith("M")));
@@ -192,6 +131,49 @@ namespace XUnitTest
             Assert.Equal(2, gNew.Count());
             Assert.True(gNew.Contains("Mike"));
             Assert.True(gNew.Contains("Mandar"));
+            Assert.False(gNew.Contains("Sergey"));
         }
+
+        public void WhereTestNumber()
+        {
+            var a = new ExternalInput<int>();
+            var g = a.Where(v => (v > 7  && v % 4 == 0));
+
+            //
+            var aData = new int[] { 12, 9, 3, 4, 8 };
+
+            //
+            var inMemory = new InMemory();
+
+            inMemory.SetInput(a, aData);
+            var gNew = inMemory.Get(g);
+            Assert.Equal(2, gNew.Count());
+            Assert.False(gNew.Contains(12));
+            Assert.True(gNew.Contains(8));
+        }
+
+
+        [Fact]
+        public void GroupingTest()
+        {
+            var a = new ExternalInput<double>();
+            var g = a.GroupBy(v => v.ToString(), _ => 1, (ai, bi) => ai + bi);
+ 
+
+            //data
+            var aData = new double[] { 6, 6, 5, 7,7,7 };
+
+            //backend
+            var inMemory = new InMemory();
+
+            inMemory.SetInput(a, aData);
+            var gNew = inMemory.Get(g);
+            Assert.Equal(3, gNew.Count());
+            Assert.True(gNew.Any(v=> v.Item1 == "5" && v.Item2 == 1));
+            Assert.True(gNew.Any(v => v.Item1 == "6" && v.Item2 == 2));
+            Assert.True(gNew.Any(v => v.Item1 == "7" && v.Item2 == 3));
+        }
+        
+
     }
 }
