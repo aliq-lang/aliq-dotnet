@@ -30,6 +30,10 @@ namespace RemoteBackEnd
             } 
         }
 
+        public static void RunServer(Assembly assembly)
+        {
+        }
+
         public static int Main(string[] args)
         {
             try
@@ -39,11 +43,23 @@ namespace RemoteBackEnd
                     Console.Error.WriteLine("error: no arguments");
                     return -1;
                 }
-                var dllPath = args[0];
-                var nodeId = int.Parse(args[1]);
-                var nodeCount = int.Parse(args[2]);
+                var command = args[0];
+                var dllPath = args[1];
                 var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(dllPath);
-                Run(assembly, Console.In, nodeId, nodeCount);
+                switch (command)
+                {
+                    case "node":
+                        var nodeId = int.Parse(args[2]);
+                        var nodeCount = int.Parse(args[3]);
+                        Run(assembly, Console.In, nodeId, nodeCount);
+                        break;
+                    case "server":
+                        RunServer(assembly);
+                        break;
+                    default:
+                        Console.Error.WriteLine("unknown command: " + command);
+                        break;
+                }                                               
                 return 0;
             }
             catch (Exception e)

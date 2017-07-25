@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace RemoteBackEnd
 {
-    sealed class DataBinding : IDataBinding
+    public sealed class DataBinding : IDataBinding
     {
         public void Set<T>(Bag<T> bag, string bagId)
         {
