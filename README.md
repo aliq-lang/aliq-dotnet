@@ -10,7 +10,7 @@ Use the `Bag` type and extension methods from [Aliq\Extensions.cs](Aliq\Extensio
 
 ### Creating a Back-End Which Execute the Business-Logic
 
-Implemt a `Bag<T>.IVisitor` from [Aliq\Bag.cs](Aliq\Bag.cs).
+Implement a `Bag<T>.IVisitor` from [Aliq\Bag.cs](Aliq\Bag.cs).
 
 ## For Developers
 
