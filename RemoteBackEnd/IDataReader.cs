@@ -4,6 +4,6 @@ namespace RemoteBackEnd
 {
     interface IDataReader<T> : IDisposable
     {
-        T Read();
+        (bool, T) Read();
     }
 }
