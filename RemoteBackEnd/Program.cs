@@ -6,7 +6,7 @@ namespace RemoteBackEnd
 {
     public class Program
     {
-        public static void Main(Assembly assembly)
+        public static void Run(Assembly assembly)
         {
             var logicType = assembly.GetType("Logic");
             var dataBinding = new DataBinding();
@@ -24,7 +24,7 @@ namespace RemoteBackEnd
                 }
                 var dllPath = args[0];
                 var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(dllPath);
-                Main(assembly);
+                Run(assembly);
                 return 0;
             }
             catch (Exception e)
