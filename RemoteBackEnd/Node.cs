@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 
 namespace RemoteBackEnd
 {
-    sealed class Node
+    sealed class Node : INode
     {
         public Node(
             DataBinding dataBinding,
@@ -43,13 +43,6 @@ namespace RemoteBackEnd
                 return;
             }
             bag.Accept(new CreateVisitor<T>(this, id));
-        }
-
-        public void Shuffle<T, I>(string id, GroupBy<T, I> bag)
-        {
-            // TODO: get data from other and merge
-            // TODO: selectMany
-            // TODO: save
         }
 
         private void Save<T>(string id, IEnumerable<T> list)
@@ -193,6 +186,27 @@ namespace RemoteBackEnd
             return DataStorage.Exist(id)
                 ? Load<T>(id)
                 : bag.Accept(new GetVisitor<T>(this, id));
+        }
+
+        public void Create(string bagId)
+        {
+            DataBinding.GetBag(bagId).Accept(new CreateVisitor(this, bagId));
+        }
+
+        private sealed class CreateVisitor : Bag.IVisitor<Aliq.Void>
+        {
+            public CreateVisitor(Node node, string id)
+            {
+                Node = node;
+                Id = id; 
+            }
+
+            private Node Node { get; }
+
+            private string Id { get; }
+
+            public Aliq.Void Visit<T>(Bag<T> bag)
+                => bag.Accept(new CreateVisitor<T>(Node, Id));
         }
 
         private sealed class GetVisitor<T> : Bag<T>.IVisitor<IEnumerable<T>>

@@ -1,6 +1,8 @@
 ﻿using Aliq;
 using System;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 
@@ -14,12 +16,17 @@ namespace RemoteBackEnd
                 .GetMethod("Init")
                 .Invoke(null, new object[] { dataBinding });
 
-        public static void RunNode(
-            Assembly assembly, TextReader reader, int nodeId, int nodeCount)
+        private static Node CreateNode(Assembly assembly, int nodeId, int nodeCount)
         {
             var dataBinding = new DataBinding();
             InitDataBinding(assembly, dataBinding);
-            var node = new Node(dataBinding, null, null, nodeId, nodeCount);
+            return new Node(dataBinding, null, null, nodeId, nodeCount);
+        }
+
+        public static void RunNode(
+            Assembly assembly, TextReader reader, int nodeId, int nodeCount)
+        {
+            var node = CreateNode(assembly, nodeId, nodeCount);
             while(true)
             {
                 var line = reader.ReadLine();
@@ -37,9 +44,12 @@ namespace RemoteBackEnd
             } 
         }
 
-        public static void RunServer(Assembly assembly)
+        public static void RunServer(Assembly assembly, int nodesCount)
         {
-            var server = new Server();
+            var nodes = Enumerable
+                .Range(0, nodesCount)
+                .Select(i => CreateNode(assembly, i, nodesCount));
+            var server = new Server(nodes);
             InitDataBinding(assembly, server);
             server.Run();
         }
@@ -55,16 +65,16 @@ namespace RemoteBackEnd
                 }
                 var command = args[0];
                 var dllPath = args[1];
+                var nodeCount = int.Parse(args[2]);
                 var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(dllPath);
                 switch (command)
                 {
                     case "node":
-                        var nodeId = int.Parse(args[2]);
-                        var nodeCount = int.Parse(args[3]);
+                        var nodeId = int.Parse(args[3]);
                         RunNode(assembly, Console.In, nodeId, nodeCount);
                         break;
                     case "server":
-                        RunServer(assembly);
+                        RunServer(assembly, nodeCount);
                         break;
                     default:
                         Console.Error.WriteLine("unknown command: " + command);

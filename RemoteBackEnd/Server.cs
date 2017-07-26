@@ -1,11 +1,19 @@
 ﻿using Aliq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace RemoteBackEnd
 {
     public class Server : IDataBinding
     {
+        public Server(IEnumerable<INode> nodes)
+        {
+            Nodes = nodes.ToImmutableList();
+        }
+
+        private ImmutableList<INode> Nodes { get; }
+
         public void Run()
         {
             foreach (var (id, bag) in InputOutputList)
