@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aliq\Aliq.csproj" />
+    <ProjectReference Include="..\BusinessLogicTest\BusinessLogicTest.csproj" />
+    <ProjectReference Include="..\RemoteBackEnd\RemoteBackEnd.csproj" />
   </ItemGroup>
 
   <ItemGroup>
