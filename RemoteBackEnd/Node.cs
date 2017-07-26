@@ -134,7 +134,7 @@ namespace RemoteBackEnd
                     .Select((v, i) => (v, i))
                     .Where(x => x.Item2 != Node.NodeId))
                 {
-                    Node.Nodes.SendData(i, Id, v.SelectValueTuples());
+                    Node.Nodes.ShareData(i, Id, v.SelectValueTuples());
                 }
                 array = null;
                 // recieve data
@@ -142,7 +142,7 @@ namespace RemoteBackEnd
                     .Range(0, Node.NodeCount)
                     .Where(i => i != Node.NodeId))
                 {
-                    foreach(var record in Node.Nodes.RecieveData<I>(i, Id))
+                    foreach(var record in Node.Nodes.GetData<I>(i, Id))
                     {
                         AddRecord(main, record, reduce);
                     }
