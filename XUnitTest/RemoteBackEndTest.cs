@@ -18,7 +18,7 @@ namespace XUnitTest
         void TestBusinessLogic()
         {
             var assembly = typeof(Logic).GetTypeInfo().Assembly;
-            Program.Run(assembly, new StringReader("exit"), 0, 1);
+            Program.RunNode(assembly, new StringReader("exit"), 0, 1);
         }
     }
 }

@@ -273,6 +273,10 @@ namespace Aliq
         public static NumberOf<T> NumberOf<T>(this T value)
             => value.NumberOf(1);
 
+        public static IEnumerable<(K Key, V Value)> SelectValueTuples<K, V>(
+            this IEnumerable<KeyValuePair<K, V>> dictionary)
+            => dictionary.Select(v => (v.Key, v.Value));
+
         public static Bag<NumberOf<T>> ToNumberOf<T>(this Bag<T> input, long count = 1)
             => input.Select(v => v.NumberOf<T>(count));
 
