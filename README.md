@@ -12,6 +12,13 @@ Use the `Bag` type and extension methods from [Aliq\Extensions.cs](Aliq\Extensio
 
 Implement a `Bag<T>.IVisitor` from [Aliq\Bag.cs](Aliq\Bag.cs).
 
+## Back-End Examples
+
+- Enumerable.
+- Advanced Enumerable:
+  - multi-threading (# of threads/nodes == # of processord).
+  - cache tables that will be reused.
+
 ## For Developers
 
 [![Build Status](https://travis-ci.org/sergey-shandar/aliq.svg?branch=master)](https://travis-ci.org/sergey-shandar/aliq)

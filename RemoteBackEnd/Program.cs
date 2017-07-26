@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Aliq;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -7,31 +8,40 @@ namespace RemoteBackEnd
 {
     public class Program
     {
-        public static void Run(
+        public static void InitDataBinding(Assembly assembly, IDataBinding dataBinding)
+            => assembly
+                .GetType("Logic")
+                .GetMethod("Init")
+                .Invoke(null, new object[] { dataBinding });
+
+        public static void RunNode(
             Assembly assembly, TextReader reader, int nodeId, int nodeCount)
         {
-            var logicType = assembly.GetType("Logic");
             var dataBinding = new DataBinding();
-            logicType.GetMethod("Init").Invoke(null, new object[] { dataBinding });
-            var node = new Node(dataBinding, nodeId, nodeCount);
+            InitDataBinding(assembly, dataBinding);
+            var node = new Node(dataBinding, null, null, nodeId, nodeCount);
             while(true)
             {
                 var line = reader.ReadLine();
-                if (line != null)
+                if (line == null)
                 {
-                    var split = line.Split(' ');
-                    var command = split[0];
-                    if (command == "exit")
-                    {
-                        break;
-                    }
-                    Console.Error.WriteLine("invalid command: " + line);
+                    Console.Error.WriteLine("unexpected end of stream");
                 }
+                var split = line.Split(' ');
+                var command = split[0];
+                if (command == "exit")
+                {
+                    break;
+                }
+                Console.Error.WriteLine("invalid command: " + line);
             } 
         }
 
         public static void RunServer(Assembly assembly)
         {
+            var server = new Server();
+            InitDataBinding(assembly, server);
+            server.Run();
         }
 
         public static int Main(string[] args)
@@ -51,7 +61,7 @@ namespace RemoteBackEnd
                     case "node":
                         var nodeId = int.Parse(args[2]);
                         var nodeCount = int.Parse(args[3]);
-                        Run(assembly, Console.In, nodeId, nodeCount);
+                        RunNode(assembly, Console.In, nodeId, nodeCount);
                         break;
                     case "server":
                         RunServer(assembly);

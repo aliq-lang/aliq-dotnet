@@ -46,7 +46,7 @@ namespace XUnitTest
             var gNew = inMemory.Get(g);
             Assert.Equal(1, gNew.Count());
             var item = gNew.First();
-            Assert.Equal("Hellpworld!".Length, item.Length);
+            Assert.Equal("Helloworld!".Length, item.Length);
         }
 
         [Fact]
