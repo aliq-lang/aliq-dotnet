@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Aliq
 {
-    public sealed class InMemory
+    public sealed class EnumerableAdapter
     {
         public void SetInput<T>(ExternalInput<T> inputBag, IEnumerable<T> inputData)
         {
@@ -19,7 +19,7 @@ namespace Aliq
 
         private sealed class Visitor<T> : Bag<T>.IVisitor<IEnumerable<T>>
         {
-            public Visitor(InMemory inMemory)
+            public Visitor(EnumerableAdapter inMemory)
             {
                 InMemory = inMemory;
             }
@@ -62,7 +62,7 @@ namespace Aliq
                 return a.SelectMany(ai => b.SelectMany(bi => product.Func(ai, bi)));
             }
 
-            private InMemory InMemory;
+            private EnumerableAdapter InMemory;
         }
     }
 }
