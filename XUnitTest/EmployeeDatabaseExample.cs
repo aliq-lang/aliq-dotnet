@@ -1,13 +1,13 @@
 using Aliq;
 using System.Linq;
-using Xunit;
 using System;
+using Xunit;
 
 namespace XUnitTest
 {
     public class AzureAliqAdapterTest
     {
-
+        [Fact]
         public void Test()
         {
             // ExternalInput allows for late binding
@@ -21,7 +21,7 @@ namespace XUnitTest
 
             // Set up the adapter layer which performs operations on the data
             // var azureAliqAdapter = new AzureAliqAdapter();
-            var azureAliqAdapter = new InMemory();
+            var azureAliqAdapter = new EnumerableAdapter();
 
             // Data can be anywhere!
             var dataStore = new Employee[] { }; // Azure blob container
@@ -32,11 +32,7 @@ namespace XUnitTest
             var youth = azureAliqAdapter.Get(youthLogic);
             var veterans = azureAliqAdapter.Get(veteransLogic);
             var inBetweeners = azureAliqAdapter.Get(inBetweenersLogic);
-
-
-
         }
-
     }
 
     // Sample data struct
