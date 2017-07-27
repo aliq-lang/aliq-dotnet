@@ -3,6 +3,7 @@ using Aliq.Adapters;
 using Aliq.Bags;
 using Aliq.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Xunit;
