@@ -9,5 +9,3 @@ artifacts:
 build:
   project: Aliq.sln
   verbosity: minimal
-after_build:
- - ps: buildAliqcomms.ps1
