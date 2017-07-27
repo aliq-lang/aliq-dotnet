@@ -1,16 +1,14 @@
-﻿using Aliq;
-using Aliq.Adapters;
+﻿using Aliq.Adapters;
 using Aliq.Bags;
 using Aliq.Linq;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Xunit;
 
 namespace XUnitTest
 {
-    public class ObservableAdapter2Test
+    public class ColdObservableAdapterTest
     {
         public IEnumerable<string> Get()
         {
@@ -27,11 +25,14 @@ namespace XUnitTest
             var b = a.Select(v => v + v);
             var r = b.Select(v => v.Length).Average();
 
+            //-----------------------------------------------
+
+
             // data
-            var aTable = Get().ToArray();
+            var aTable = Get();
 
             // back end
-            var inMemory = new HotObservableAdapter();
+            var inMemory = new ColdObservableAdapter();
 
             // binding
             inMemory.SetInput(a, Get().ToObservable());
@@ -42,22 +43,19 @@ namespace XUnitTest
             var newA = inMemory.Get(a);
             newA.Subscribe(Observer.Create<string>(v => x.Add(v)));
             newA.Subscribe(Observer.Create<string>(v => y.Add(v)));
+            Assert.Equal(aTable, x);
 
             var z = new List<string>();
             var d = new List<string>();
             var newB = inMemory.Get(b);
             newB.Subscribe(Observer.Create<string>(v => z.Add(v)));
             newB.Subscribe(Observer.Create<string>(v => d.Add(v)));
+            Assert.Equal(z, new[] { "aa", "bb", "cc" });
+            Assert.Equal(d, new[] { "aa", "bb", "cc" });
 
             var rr = new List<int>();
             var newR = inMemory.Get(r);
             newR.Subscribe(Observer.Create<int>(v => rr.Add(v)));
-
-            inMemory.Start();
-
-            Assert.Equal(z, new[] { "aa", "bb", "cc" });
-            Assert.Equal(d, new[] { "aa", "bb", "cc" });
-            Assert.Equal(aTable, x);
             Assert.Equal(rr, new[] { 2 });
         }
     }
