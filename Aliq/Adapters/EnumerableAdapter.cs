@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 
-namespace Aliq
+namespace Aliq.Adapters
 {
     public sealed class EnumerableAdapter
     {

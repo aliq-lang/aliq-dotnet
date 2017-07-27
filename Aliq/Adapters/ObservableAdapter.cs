@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 
-namespace Aliq
+namespace Aliq.Adapters
 {
     public sealed class ObservableAdapter
     {

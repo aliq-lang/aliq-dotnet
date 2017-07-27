@@ -1,7 +1,7 @@
 ﻿using Aliq.Linq;
 using System.Collections.Generic;
 
-namespace Aliq
+namespace Aliq.Linq
 {
     public struct NumberOf<T>
     {

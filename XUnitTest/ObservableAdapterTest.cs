@@ -1,4 +1,5 @@
 ﻿using Aliq;
+using Aliq.Adapters;
 using Aliq.Linq;
 using System.Collections.Generic;
 using System.Reactive;
