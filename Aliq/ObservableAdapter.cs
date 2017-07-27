@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 
 namespace Aliq
 {
@@ -23,7 +22,7 @@ namespace Aliq
             public IObservable<T> Visit<I>(SelectMany<T, I> selectMany)
                 => Adapter.Get(selectMany.Input).SelectMany(selectMany.Func);
 
-            public IObservable<T> Visit(DisjointUnion<T> disjointUnion)
+            public IObservable<T> Visit(Merge<T> disjointUnion)
             {
                 var a = Adapter.Get(disjointUnion.InputA);
                 var b = Adapter.Get(disjointUnion.InputB);
@@ -76,39 +75,5 @@ namespace Aliq
         }
 
         private BagMap Map { get; } = new BagMap();
-
-        /*
-        public void SetInput<T>(ExternalInput<T> bag, IObservable<T> input)
-            => GetNode(bag).SetInput(input);
-
-        public IObservable<T> Get<T>(Bag<T> bag)
-            => GetNode(bag);
-
-        private Node<T> GetNode<T>(Bag<T> bag)
-        {
-            if (Map.TryGetValue(bag, out var node))
-            {
-                return (Node<T>)node;
-            }
-            else
-            {
-                var nodeT = new Node<T>();
-                Map[bag] = nodeT;
-                return nodeT;
-            }
-        }
-
-        private sealed class Node<T> : Node, IObservable<T>
-        {
-            public void AddCallBack(Func<IEnumerable<T>> callBack)
-                => CallBacks.Add(callBack);
-
-            private IEnumerable<T> Input { get; set; }
-                = null;
-
-            private List<Func<IEnumerable<T>>> CallBacks { get; }
-                = new List<Func<IEnumerable<T>>>();
-        }
-            */
     }
 }

@@ -2,6 +2,7 @@ using Aliq;
 using System.Linq;
 using System;
 using Xunit;
+using Aliq.Linq;
 
 namespace XUnitTest
 {

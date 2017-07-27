@@ -2,9 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
-namespace Aliq
+namespace Aliq.Linq
 {
     public static class Extensions
     {
@@ -83,8 +82,8 @@ namespace Aliq
             => input.GroupBy(getKey, reduce, EqualityComparer<K>.Default);
         */
 
-        public static DisjointUnion<T> DisjointUnion<T>(this Bag<T> a, Bag<T> b)
-            => new DisjointUnion<T>(a, b);
+        public static Merge<T> Merge<T>(this Bag<T> a, Bag<T> b)
+            => new Merge<T>(a, b);
 
         public static SelectMany<T, I> SelectMany<T, I>(
             this Bag<I> input, Func<I, IEnumerable<T>> map)
@@ -103,7 +102,7 @@ namespace Aliq
 
         public static Bag<T> Aggregate<T>(
             this Bag<T> input, T value, Func<T, T, T> reduce)
-            => value.ToConstBag().DisjointUnion(input).Aggregate(reduce);
+            => value.ToConstBag().Merge(input).Aggregate(reduce);
 
         public static Bag<R> Aggregate<T, R>(
             this Bag<T> input,
@@ -265,7 +264,7 @@ namespace Aliq
                 .Any()
                 .Where(v => !v)
                 .Select(_ => value)
-                .DisjointUnion(input);
+                .Merge(input);
 
         public static NumberOf<T> NumberOf<T>(this T value, long count)
             => new NumberOf<T>(value, count);
@@ -299,7 +298,7 @@ namespace Aliq
             this Bag<T> input, Bag<T> b, Func<T, string> getKey)
             => input
                 .ToNumberOf()
-                .DisjointUnion(b.ToNumberOf(-1))
+                .Merge(b.ToNumberOf(-1))
                 .Group(getKey)
                 .SelectMany(v => v.Repeat());
 

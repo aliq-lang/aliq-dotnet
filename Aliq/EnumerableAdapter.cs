@@ -31,7 +31,7 @@ namespace Aliq
                     .SelectMany(selectMany.Func);
             }
 
-            public IEnumerable<T> Visit(DisjointUnion<T> disjointUnion)
+            public IEnumerable<T> Visit(Merge<T> disjointUnion)
             {
                 var a = InMemory.Get(disjointUnion.InputA);
                 var b = InMemory.Get(disjointUnion.InputB);

@@ -1,4 +1,5 @@
 using Aliq;
+using Aliq.Linq;
 using System.Linq;
 using Xunit;
 

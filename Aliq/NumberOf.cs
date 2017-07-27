@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Aliq.Linq;
+using System.Collections.Generic;
 
 namespace Aliq
 {

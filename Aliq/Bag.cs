@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Aliq.Linq;
+using System.Linq;
 
 namespace Aliq
 {
@@ -37,7 +38,7 @@ namespace Aliq
         public new interface IVisitor<R>
         {
             R Visit<I>(SelectMany<T, I> selectMany);
-            R Visit(DisjointUnion<T> disjointUnion);
+            R Visit(Merge<T> merge);
             R Visit(ExternalInput<T> externalInput);
             R Visit(Const<T> const_);
             R Visit<I>(GroupBy<T, I> groupBy);

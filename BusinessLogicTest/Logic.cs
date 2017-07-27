@@ -1,4 +1,5 @@
 ﻿using Aliq;
+using Aliq.Linq;
 
 public static class Logic
 {

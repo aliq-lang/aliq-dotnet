@@ -52,7 +52,7 @@ namespace RemoteBackEnd
                 return new Aliq.Void();
             }
 
-            public Aliq.Void Visit(DisjointUnion<T> disjointUnion)
+            public Aliq.Void Visit(Merge<T> disjointUnion)
             {
                 DataBinding.Set(disjointUnion.InputA, ObjectId + "_a");
                 DataBinding.Set(disjointUnion.InputB, ObjectId + "_b");
