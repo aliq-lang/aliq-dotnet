@@ -1,4 +1,4 @@
-﻿namespace Aliq
+﻿namespace Aliq.Bags
 {
     public sealed class Const<T> : Bag<T>
     {

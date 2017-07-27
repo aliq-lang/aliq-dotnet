@@ -1,4 +1,5 @@
 ﻿using Aliq;
+using Aliq.Bags;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -69,7 +70,7 @@ namespace RemoteBackEnd
                 return new Aliq.Void();
             }
 
-            public Aliq.Void Visit(DisjointUnion<T> disjointUnion)
+            public Aliq.Void Visit(Merge<T> disjointUnion)
             {
                 Server.Produce(disjointUnion.InputA, Indent);
                 Server.Produce(disjointUnion.InputB, Indent);

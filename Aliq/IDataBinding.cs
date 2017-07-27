@@ -1,4 +1,6 @@
-﻿namespace Aliq
+﻿using Aliq.Bags;
+
+namespace Aliq
 {
     public interface IDataBinding
     {
