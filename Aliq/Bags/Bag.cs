@@ -1,7 +1,7 @@
 ﻿using Aliq.Linq;
 using System.Linq;
 
-namespace Aliq
+namespace Aliq.Bags
 {
     // Bag is a multiset (unordered list of elements which may contain duplicates)
     public abstract class Bag

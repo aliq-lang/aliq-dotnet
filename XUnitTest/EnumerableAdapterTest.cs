@@ -1,5 +1,6 @@
 using Aliq;
 using Aliq.Adapters;
+using Aliq.Bags;
 using Aliq.Linq;
 using System.Linq;
 using Xunit;

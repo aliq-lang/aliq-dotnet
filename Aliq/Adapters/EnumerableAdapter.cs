@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using Aliq.Bags;
 
 namespace Aliq.Adapters
 {

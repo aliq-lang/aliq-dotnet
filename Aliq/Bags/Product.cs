@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
-namespace Aliq
+namespace Aliq.Bags
 {
     public sealed class Product<T, A, B> : Bag<T>
     {

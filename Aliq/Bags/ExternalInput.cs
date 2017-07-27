@@ -1,4 +1,4 @@
-﻿namespace Aliq
+﻿namespace Aliq.Bags
 {
     public sealed class ExternalInput<T> : Bag<T>
     {

@@ -1,4 +1,5 @@
-﻿using NumericPolicies;
+﻿using Aliq.Bags;
+using NumericPolicies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,9 @@ namespace Aliq.Linq
         }
 
         public static GroupBy<T, I> GroupBy<T, I>(
-            this Bag<(string, I)> input,
+            this Bag<(string Key, I Value)> input,
             Func<I, I, I> reduce,
-            Func<(string, I), IEnumerable<T>> getResult)
+            Func<(string Key, I Value), IEnumerable<T>> getResult)
             => new GroupBy<T, I>(input, reduce, getResult);
 
         public static Bag<T> GroupBy<T, I, V>(
@@ -26,12 +27,12 @@ namespace Aliq.Linq
             Func<I, string> getKey,
             Func<I, V> getElement,
             Func<V, V, V> reduce,
-            Func<(string, V), IEnumerable<T>> getResult)
+            Func<(string Key, V Value), IEnumerable<T>> getResult)
             => input
                 .Select(v => (getKey(v), getElement(v)))
                 .GroupBy(reduce, getResult);
 
-        public static Bag<(string, T)> GroupBy<T, I>(
+        public static Bag<(string Key, T Value)> GroupBy<T, I>(
             this Bag<I> input,
             Func<I, string> getKey,
             Func<I, T> getElement,

@@ -1,20 +1,34 @@
-﻿using System;
+﻿using Aliq.Bags;
+using Aliq.Linq;
+using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace Aliq.Adapters
 {
-    public sealed class ObservableAdapter
+    public sealed class HotObservableAdapter
     {
         public void SetInput<T>(ExternalInput<T> bag, IObservable<T> input)
-            => Map.GetOrCreate(bag, () => input);
+        {
+            var subject = (Subject<T>)Get(bag);
+            StartSubject.Subscribe(_ => input.Subscribe(subject));
+        }
 
         public IObservable<T> Get<T>(Bag<T> bag)
             => Map.GetOrCreate(bag, () => bag.Accept(new CreateVisitor<T>(this)));
 
+        public void Start()
+            => Observable
+                .Return(new Void())
+                .Subscribe(StartSubject);
+
+        private Subject<Void> StartSubject { get; }
+            = new Subject<Void>();
+
         private sealed class CreateVisitor<T> : Bag<T>.IVisitor<IObservable<T>>
         {
-            public CreateVisitor(ObservableAdapter adapter)
+            public CreateVisitor(HotObservableAdapter adapter)
             {
                 Adapter = adapter;
             }
@@ -22,25 +36,23 @@ namespace Aliq.Adapters
             public IObservable<T> Visit<I>(SelectMany<T, I> selectMany)
                 => Adapter.Get(selectMany.Input).SelectMany(selectMany.Func);
 
-            public IObservable<T> Visit(Merge<T> disjointUnion)
+            public IObservable<T> Visit(Merge<T> merge)
             {
-                var a = Adapter.Get(disjointUnion.InputA);
-                var b = Adapter.Get(disjointUnion.InputB);
+                var a = Adapter.Get(merge.InputA);
+                var b = Adapter.Get(merge.InputB);
                 return a.Merge(b);
             }
 
             public IObservable<T> Visit(ExternalInput<T> externalInput)
-            {
-                throw new Exception("No external input");
-            }
+                => new Subject<T>();
 
             public IObservable<T> Visit(Const<T> const_)
-                => Observable.Return(const_.Value);
+                => Adapter.StartSubject.Select(_ => const_.Value);
 
             public IObservable<T> Visit<I>(GroupBy<T, I> groupBy)
                 => Adapter
                     .Get(groupBy.Input)
-                    .GroupBy(x => x.Item1, x => x.Item2)
+                    .GroupBy(x => x.Key, x => x.Value)
                     .SelectMany(g => g.Aggregate(groupBy.Reduce).Select(v => (g.Key, v)))
                     .SelectMany(groupBy.GetResult);
 
@@ -51,24 +63,13 @@ namespace Aliq.Adapters
                 return a.SelectMany(ai => b.SelectMany(bi => product.Func(ai, bi)));
             }
 
-            private ObservableAdapter Adapter { get; }
+            private HotObservableAdapter Adapter { get; }
         }
 
         private sealed class BagMap
         {
             public IObservable<T> GetOrCreate<T>(Bag<T> bag, Func<IObservable<T>> create)
-            {
-                if (Dictionary.TryGetValue(bag, out var observable))
-                {
-                    return observable as IObservable<T>;
-                }
-                else
-                {
-                    var observableT = create();
-                    Dictionary[bag] = observableT;
-                    return observableT;
-                }
-            }
+                => Dictionary.GetOrCreate(bag, create);
 
             private Dictionary<Bag, object> Dictionary { get; }
                 = new Dictionary<Bag, object>();

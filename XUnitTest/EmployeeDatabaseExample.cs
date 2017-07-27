@@ -4,6 +4,7 @@ using System;
 using Xunit;
 using Aliq.Linq;
 using Aliq.Adapters;
+using Aliq.Bags;
 
 namespace XUnitTest
 {
