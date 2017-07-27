@@ -1,4 +1,6 @@
-﻿namespace Aliq
+﻿using System.Linq;
+
+namespace Aliq
 {
     // Bag is a multiset (unordered list of elements which may contain duplicates)
     public abstract class Bag
@@ -21,6 +23,9 @@
         //
         // string itemTypeName = b.Accept(new Visitor());
         public abstract R Accept<R>(IVisitor<R> visitor);
+
+        public static Bag<T> Empty<T>()
+            => false.ToConstBag().SelectMany(v => Enumerable.Empty<T>());
     }
 
     // A Bag which contains elements of type T
@@ -35,7 +40,7 @@
             R Visit(DisjointUnion<T> disjointUnion);
             R Visit(ExternalInput<T> externalInput);
             R Visit(Const<T> const_);
-            R Visit<K>(GroupBy<T, K> groupBy);
+            R Visit<I>(GroupBy<T, I> groupBy);
             R Visit<A, B>(Product<T, A, B> product);
         }
 

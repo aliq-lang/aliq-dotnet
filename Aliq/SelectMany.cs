@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace Aliq
 {
@@ -8,9 +7,9 @@ namespace Aliq
     {
         public Bag<I> Input { get; }
 
-        public Expression<Func<I, IEnumerable<T>>> Func { get; }
+        public Func<I, IEnumerable<T>> Func { get; }
 
-        public SelectMany(Bag<I> input, Expression<Func<I, IEnumerable<T>>> func)
+        public SelectMany(Bag<I> input, Func<I, IEnumerable<T>> func)
         {
             Input = input;
             Func = func;
