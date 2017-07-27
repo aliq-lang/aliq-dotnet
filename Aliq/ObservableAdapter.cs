@@ -11,7 +11,7 @@ namespace Aliq
             => Map.GetOrCreate(bag, () => input);
 
         public IObservable<T> Get<T>(Bag<T> bag)
-            => Map.GetOrCreate(bag, () => null);
+            => Map.GetOrCreate(bag, () => bag.Accept(new CreateVisitor<T>(this)));
 
         private sealed class CreateVisitor<T> : Bag<T>.IVisitor<IObservable<T>>
         {
