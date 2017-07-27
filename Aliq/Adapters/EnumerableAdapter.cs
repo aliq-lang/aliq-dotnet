@@ -8,9 +8,7 @@ namespace Aliq.Adapters
     public sealed class EnumerableAdapter
     {
         public void SetInput<T>(ExternalInput<T> inputBag, IEnumerable<T> inputData)
-        {
-            InputMap[inputBag] = inputData;
-        }
+            => InputMap[inputBag] = inputData;
 
         public IEnumerable<T> Get<T>(Bag<T> bag)
             => bag.Accept(new Visitor<T>(this));

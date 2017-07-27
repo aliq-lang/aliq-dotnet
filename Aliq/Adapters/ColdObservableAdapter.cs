@@ -32,9 +32,7 @@ namespace Aliq.Adapters
             }
 
             public IObservable<T> Visit(ExternalInput<T> externalInput)
-            {
-                throw new Exception("No external input");
-            }
+                => throw new Exception("no input");
 
             public IObservable<T> Visit(Const<T> const_)
                 => Observable.Return(const_.Value);
