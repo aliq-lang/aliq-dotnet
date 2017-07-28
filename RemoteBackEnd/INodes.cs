@@ -4,8 +4,8 @@ namespace RemoteBackEnd
 {
     public interface INodes
     {
-        void SendData<T>(int nodeId, string name, IEnumerable<(string, T)> data);
+        void ShareData<T>(int nodeId, string name, IEnumerable<(string, T)> data);
 
-        IEnumerable<(string, T)> RecieveData<T>(int nodeId, string name);
+        IEnumerable<(string, T)> GetData<T>(int nodeId, string name);
     }
 }

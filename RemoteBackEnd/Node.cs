@@ -1,8 +1,9 @@
-﻿using Aliq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Collections.Immutable;
+using Aliq.Linq;
+using Aliq.Bags;
 
 namespace RemoteBackEnd
 {
@@ -87,7 +88,7 @@ namespace RemoteBackEnd
                 return new Aliq.Void();
             }
 
-            public Aliq.Void Visit(DisjointUnion<T> disjointUnion)
+            public Aliq.Void Visit(Merge<T> disjointUnion)
             {
                 Node.Save(Id, Node.GetDisjointUnion(disjointUnion));
                 return new Aliq.Void();
@@ -134,7 +135,7 @@ namespace RemoteBackEnd
                     .Select((v, i) => (v, i))
                     .Where(x => x.Item2 != Node.NodeId))
                 {
-                    Node.Nodes.SendData(i, Id, v.SelectValueTuples());
+                    Node.Nodes.ShareData(i, Id, v.SelectValueTuples());
                 }
                 array = null;
                 // recieve data
@@ -142,7 +143,7 @@ namespace RemoteBackEnd
                     .Range(0, Node.NodeCount)
                     .Where(i => i != Node.NodeId))
                 {
-                    foreach(var record in Node.Nodes.RecieveData<I>(i, Id))
+                    foreach(var record in Node.Nodes.GetData<I>(i, Id))
                     {
                         AddRecord(main, record, reduce);
                     }
@@ -162,7 +163,7 @@ namespace RemoteBackEnd
         private IEnumerable<T> GetSelectMany<T, I>(SelectMany<T, I> selectMany)
             => Get(selectMany.Input).SelectMany(selectMany.Func);
 
-        private IEnumerable<T> GetDisjointUnion<T>(DisjointUnion<T> disjointUnion)
+        private IEnumerable<T> GetDisjointUnion<T>(Merge<T> disjointUnion)
         {
             var a = Get(disjointUnion.InputA);
             var b = Get(disjointUnion.InputB);
@@ -223,7 +224,7 @@ namespace RemoteBackEnd
             public IEnumerable<T> Visit<I>(SelectMany<T, I> selectMany)
                 => Node.GetSelectMany(selectMany);
 
-            public IEnumerable<T> Visit(DisjointUnion<T> disjointUnion)
+            public IEnumerable<T> Visit(Merge<T> disjointUnion)
                 => Node.GetDisjointUnion(disjointUnion);
 
             public IEnumerable<T> Visit(ExternalInput<T> externalInput)

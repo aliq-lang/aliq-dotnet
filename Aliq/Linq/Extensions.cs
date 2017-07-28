@@ -1,10 +1,10 @@
-﻿using NumericPolicies;
+﻿using Aliq.Bags;
+using NumericPolicies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
-namespace Aliq
+namespace Aliq.Linq
 {
     public static class Extensions
     {
@@ -17,9 +17,9 @@ namespace Aliq
         }
 
         public static GroupBy<T, I> GroupBy<T, I>(
-            this Bag<(string, I)> input,
+            this Bag<(string Key, I Value)> input,
             Func<I, I, I> reduce,
-            Func<(string, I), IEnumerable<T>> getResult)
+            Func<(string Key, I Value), IEnumerable<T>> getResult)
             => new GroupBy<T, I>(input, reduce, getResult);
 
         public static Bag<T> GroupBy<T, I, V>(
@@ -27,12 +27,12 @@ namespace Aliq
             Func<I, string> getKey,
             Func<I, V> getElement,
             Func<V, V, V> reduce,
-            Func<(string, V), IEnumerable<T>> getResult)
+            Func<(string Key, V Value), IEnumerable<T>> getResult)
             => input
                 .Select(v => (getKey(v), getElement(v)))
                 .GroupBy(reduce, getResult);
 
-        public static Bag<(string, T)> GroupBy<T, I>(
+        public static Bag<(string Key, T Value)> GroupBy<T, I>(
             this Bag<I> input,
             Func<I, string> getKey,
             Func<I, T> getElement,
@@ -83,8 +83,8 @@ namespace Aliq
             => input.GroupBy(getKey, reduce, EqualityComparer<K>.Default);
         */
 
-        public static DisjointUnion<T> DisjointUnion<T>(this Bag<T> a, Bag<T> b)
-            => new DisjointUnion<T>(a, b);
+        public static Merge<T> Merge<T>(this Bag<T> a, Bag<T> b)
+            => new Merge<T>(a, b);
 
         public static SelectMany<T, I> SelectMany<T, I>(
             this Bag<I> input, Func<I, IEnumerable<T>> map)
@@ -103,7 +103,7 @@ namespace Aliq
 
         public static Bag<T> Aggregate<T>(
             this Bag<T> input, T value, Func<T, T, T> reduce)
-            => value.ToConstBag().DisjointUnion(input).Aggregate(reduce);
+            => value.ToConstBag().Merge(input).Aggregate(reduce);
 
         public static Bag<R> Aggregate<T, R>(
             this Bag<T> input,
@@ -265,7 +265,7 @@ namespace Aliq
                 .Any()
                 .Where(v => !v)
                 .Select(_ => value)
-                .DisjointUnion(input);
+                .Merge(input);
 
         public static NumberOf<T> NumberOf<T>(this T value, long count)
             => new NumberOf<T>(value, count);
@@ -299,7 +299,7 @@ namespace Aliq
             this Bag<T> input, Bag<T> b, Func<T, string> getKey)
             => input
                 .ToNumberOf()
-                .DisjointUnion(b.ToNumberOf(-1))
+                .Merge(b.ToNumberOf(-1))
                 .Group(getKey)
                 .SelectMany(v => v.Repeat());
 
