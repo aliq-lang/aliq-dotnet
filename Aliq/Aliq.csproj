@@ -4,18 +4,19 @@
     <TargetFramework>netstandard1.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Copyright>Sergey Shandar</Copyright>
-    <PackageLicenseUrl>https://github.com/sergey-shandar/aliq/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/sergey-shandar/aliq</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/sergey-shandar/aliq</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/sergey-shandar/aliq-dotnet/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/sergey-shandar/aliq-dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sergey-shandar/aliq-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>LINQ</PackageTags>
     <Authors>Sergey Shandar</Authors>
     <Company>Sergey Shandar</Company>
     <Version>0.7</Version>
-    <Description>Abstract Language Integrated Query</Description>
+    <Description>Abstract Language Integrated Query for .Net</Description>
     <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
+    <Product>Aliq for .Net</Product>
   </PropertyGroup>
 
   <ItemGroup>
