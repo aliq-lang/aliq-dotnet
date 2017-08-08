@@ -2,10 +2,8 @@ version: 1.0.0.{build}
 image: Visual Studio 2017
 before_build:
 - ps: nuget restore
-test_script:
-- ps: dotnet test XUnitTest/XUnitTest.csproj
 artifacts:
-- path: '**/Aliq.*.nupkg'
+- path: '**/AliqWorker.*.nupkg'
 build:
-  project: Aliq.sln
+  project: AliqWorker.sln
   verbosity: minimal
