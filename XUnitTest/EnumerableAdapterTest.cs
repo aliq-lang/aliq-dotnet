@@ -1,7 +1,7 @@
 using Aliq;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.IO;
+using Aliq.Adapters;
+using Aliq.Bags;
+using Aliq.Linq;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ using Xunit;
 
 namespace XUnitTest
 {
-    public class InMemoryTest
+    public class EnumerableAdapterTest
     {
         [Fact]
         public void TestSetInput()
@@ -21,7 +21,7 @@ namespace XUnitTest
             var aTable = new[] { "Hello", "world", "!" };
 
             // back end
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             // binding
             inMemory.SetInput(a, aTable);
@@ -42,7 +42,7 @@ namespace XUnitTest
             var aTable = new[] { "Hello", "world", "!" };
 
             // back end
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             // binding
             inMemory.SetInput(a, aTable);
@@ -110,7 +110,7 @@ namespace XUnitTest
             var aData = new double[] { 3, 4, 5 };
 
             //
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);

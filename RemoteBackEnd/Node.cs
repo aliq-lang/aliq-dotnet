@@ -1,23 +1,33 @@
-﻿using Aliq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Collections.Immutable;
+using Aliq.Linq;
+using Aliq.Bags;
 
 namespace RemoteBackEnd
 {
-    sealed class Node
+    sealed class Node : INode
     {
-        public Node(DataBinding dataBinding, int nodeId, int nodeCount)
+        public Node(
+            DataBinding dataBinding,
+            IDataStorage dataStorage,
+            INodes nodes,
+            int nodeId, 
+            int nodeCount)
         {
             DataBinding = dataBinding;
+            DataStorage = dataStorage;
+            Nodes = nodes;
             NodeId = nodeId;
             NodeCount = nodeId;
         }
 
-        private int NodeId;
+        private INodes Nodes { get; }
 
-        private int NodeCount;
+        private int NodeId { get; }
+
+        private int NodeCount { get; }
 
         public DataBinding DataBinding { get; }
 
@@ -34,11 +44,6 @@ namespace RemoteBackEnd
                 return;
             }
             bag.Accept(new CreateVisitor<T>(this, id));
-        }
-
-        public Node(IDataStorage dataStorage)
-        {
-            DataStorage = dataStorage;
         }
 
         private void Save<T>(string id, IEnumerable<T> list)
@@ -83,7 +88,7 @@ namespace RemoteBackEnd
                 return new Aliq.Void();
             }
 
-            public Aliq.Void Visit(DisjointUnion<T> disjointUnion)
+            public Aliq.Void Visit(Merge<T> disjointUnion)
             {
                 Node.Save(Id, Node.GetDisjointUnion(disjointUnion));
                 return new Aliq.Void();
@@ -101,30 +106,49 @@ namespace RemoteBackEnd
                 return new Aliq.Void();
             }
 
+            private static void AddRecord<I>(
+                Dictionary<string,I> dictionary, (string Key, I Value) record, Func<I, I, I> reduce)
+            {
+                var result = dictionary.TryGetValue(record.Key, out var old)
+                    ? reduce(old, record.Value)
+                    : record.Value;
+                dictionary[record.Key] = result;
+            }
+
             public Aliq.Void Visit<I>(GroupBy<T, I> groupBy)
             {
-                var result = Node.Get(groupBy.Input).GroupBy(
-                    v => v.Item1,
-                    v => v.Item2,
-                    (key, list) => (key, list.Aggregate(groupBy.Reduce)));
-                var writerList = Enumerable
+                var array = Enumerable
                     .Range(0, Node.NodeCount)
-                    .Select(i => Node.DataStorage.Create<(string, I)>(Id + "_" + i))
+                    .Select(_ => new Dictionary<string, I>())
                     .ToImmutableList();
-                try
+
+                var reduce = groupBy.Reduce;
+                var input = Node.Get(groupBy.Input);
+                foreach (var record in input)
                 {
-                    foreach (var item in result)
+                    var nodeId = Node.GetNodeId(record.Item1);
+                    AddRecord(array[nodeId], record, reduce);
+                }
+                // send data
+                var main = array[Node.NodeId];
+                foreach (var (v, i) in array
+                    .Select((v, i) => (v, i))
+                    .Where(x => x.Item2 != Node.NodeId))
+                {
+                    Node.Nodes.ShareData(i, Id, v.SelectValueTuples());
+                }
+                array = null;
+                // recieve data
+                foreach (var i in Enumerable
+                    .Range(0, Node.NodeCount)
+                    .Where(i => i != Node.NodeId))
+                {
+                    foreach(var record in Node.Nodes.GetData<I>(i, Id))
                     {
-                        writerList[Node.GetNodeId(item.Item1)].Append(item);
+                        AddRecord(main, record, reduce);
                     }
                 }
-                finally
-                {
-                    foreach(var writer in writerList)
-                    {
-                        writer.Dispose();
-                    }
-                }
+                Node.Save(Id, main.SelectValueTuples().Select(groupBy.GetResult));
                 return new Aliq.Void();
             }
 
@@ -139,7 +163,7 @@ namespace RemoteBackEnd
         private IEnumerable<T> GetSelectMany<T, I>(SelectMany<T, I> selectMany)
             => Get(selectMany.Input).SelectMany(selectMany.Func);
 
-        private IEnumerable<T> GetDisjointUnion<T>(DisjointUnion<T> disjointUnion)
+        private IEnumerable<T> GetDisjointUnion<T>(Merge<T> disjointUnion)
         {
             var a = Get(disjointUnion.InputA);
             var b = Get(disjointUnion.InputB);
@@ -165,6 +189,27 @@ namespace RemoteBackEnd
                 : bag.Accept(new GetVisitor<T>(this, id));
         }
 
+        public void Create(string bagId)
+        {
+            DataBinding.GetBag(bagId).Accept(new CreateVisitor(this, bagId));
+        }
+
+        private sealed class CreateVisitor : Bag.IVisitor<Aliq.Void>
+        {
+            public CreateVisitor(Node node, string id)
+            {
+                Node = node;
+                Id = id; 
+            }
+
+            private Node Node { get; }
+
+            private string Id { get; }
+
+            public Aliq.Void Visit<T>(Bag<T> bag)
+                => bag.Accept(new CreateVisitor<T>(Node, Id));
+        }
+
         private sealed class GetVisitor<T> : Bag<T>.IVisitor<IEnumerable<T>>
         {
             public GetVisitor(Node node, string id)
@@ -179,7 +224,7 @@ namespace RemoteBackEnd
             public IEnumerable<T> Visit<I>(SelectMany<T, I> selectMany)
                 => Node.GetSelectMany(selectMany);
 
-            public IEnumerable<T> Visit(DisjointUnion<T> disjointUnion)
+            public IEnumerable<T> Visit(Merge<T> disjointUnion)
                 => Node.GetDisjointUnion(disjointUnion);
 
             public IEnumerable<T> Visit(ExternalInput<T> externalInput)

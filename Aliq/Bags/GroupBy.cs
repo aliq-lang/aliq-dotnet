@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Aliq
+namespace Aliq.Bags
 {
     public sealed class GroupBy<T, I> : Bag<T>
     {
-        public Bag<(string, I)> Input { get; }
+        public Bag<(string Key, I Value)> Input { get; }
 
         /// <summary>
         /// Reduce values.
@@ -18,9 +18,9 @@ namespace Aliq
         public Func<(string, I), IEnumerable<T>> GetResult { get; }
 
         public GroupBy(
-            Bag<(string, I)> input,
+            Bag<(string Key, I Value)> input,
             Func<I, I, I> reduce,
-            Func<(string, I), IEnumerable<T>> getResult)
+            Func<(string Key, I Value), IEnumerable<T>> getResult)
         {
             Input = input;
             Reduce = reduce;

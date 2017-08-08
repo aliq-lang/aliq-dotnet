@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Aliq
+namespace Aliq.Bags
 {
     public sealed class SelectMany<T, I> : Bag<T>
     {

@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using Aliq.Bags;
 
-namespace Aliq
+namespace Aliq.Adapters
 {
-    public sealed class InMemory
+    public sealed class EnumerableAdapter
     {
         public void SetInput<T>(ExternalInput<T> inputBag, IEnumerable<T> inputData)
-        {
-            InputMap[inputBag] = inputData;
-        }
+            => InputMap[inputBag] = inputData;
 
         public IEnumerable<T> Get<T>(Bag<T> bag)
             => bag.Accept(new Visitor<T>(this));
@@ -19,7 +18,7 @@ namespace Aliq
 
         private sealed class Visitor<T> : Bag<T>.IVisitor<IEnumerable<T>>
         {
-            public Visitor(InMemory inMemory)
+            public Visitor(EnumerableAdapter inMemory)
             {
                 InMemory = inMemory;
             }
@@ -31,7 +30,7 @@ namespace Aliq
                     .SelectMany(selectMany.Func);
             }
 
-            public IEnumerable<T> Visit(DisjointUnion<T> disjointUnion)
+            public IEnumerable<T> Visit(Merge<T> disjointUnion)
             {
                 var a = InMemory.Get(disjointUnion.InputA);
                 var b = InMemory.Get(disjointUnion.InputB);
@@ -62,7 +61,7 @@ namespace Aliq
                 return a.SelectMany(ai => b.SelectMany(bi => product.Func(ai, bi)));
             }
 
-            private InMemory InMemory;
+            private EnumerableAdapter InMemory;
         }
     }
 }
