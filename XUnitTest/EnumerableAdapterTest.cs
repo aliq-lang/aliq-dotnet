@@ -2,6 +2,7 @@ using Aliq;
 using Aliq.Adapters;
 using Aliq.Bags;
 using Aliq.Linq;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -65,7 +66,7 @@ namespace XUnitTest
             var aTable = new[] { 8, 30, 4 };
 
             // back end
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             // binding
             inMemory.SetInput(a, aTable);
@@ -88,7 +89,7 @@ namespace XUnitTest
             double[] aTable = (new[] { 8.0, 30.0, 4.0, 18.0 });
 
             // back end
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             // binding
             inMemory.SetInput<double>(a, aTable);
@@ -128,7 +129,7 @@ namespace XUnitTest
             var aData = new string[] { "Mike", "Sergey", "Mandar" };
 
             //
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);
@@ -147,7 +148,7 @@ namespace XUnitTest
             var aData = new int[] { 12, 9, 3, 4, 8 };
 
             //
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);
@@ -168,7 +169,7 @@ namespace XUnitTest
             var aData = new double[] { 6, 6, 5, 7, 7, 7 };
 
             //backend
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);
@@ -189,7 +190,7 @@ namespace XUnitTest
 
             var aData = new char[][] { new[] { 'a', 'a' }, new[] { 'b', 'c' }, new[] { 'd', 'd' } };
 
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);
@@ -220,7 +221,7 @@ namespace XUnitTest
 
             var aData = owners.Select(v => v.PetNames);
 
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);
@@ -258,7 +259,7 @@ namespace XUnitTest
 
             var aData = inventory;
 
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);
@@ -289,7 +290,7 @@ namespace XUnitTest
 
             var aData = inventory;
 
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);
@@ -331,7 +332,7 @@ namespace XUnitTest
 
             var aData = banks;
 
-            var inMemory = new InMemory();
+            var inMemory = new EnumerableAdapter();
 
             inMemory.SetInput(a, aData);
             var gNew = inMemory.Get(g);
