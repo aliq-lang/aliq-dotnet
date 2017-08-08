@@ -16,7 +16,9 @@ namespace Aliq.Adapters
         }
 
         public IObservable<T> Get<T>(Bag<T> bag)
-            => Map.GetOrCreate(bag, () => bag.Accept(new CreateVisitor<T>(this)));
+            => Map.GetOrCreate(
+                bag,
+                () => bag.Accept(new CreateVisitor<T>(this)));
 
         public void Start()
             => Observable
@@ -66,15 +68,7 @@ namespace Aliq.Adapters
             private HotObservableAdapter Adapter { get; }
         }
 
-        private sealed class BagMap
-        {
-            public IObservable<T> GetOrCreate<T>(Bag<T> bag, Func<IObservable<T>> create)
-                => Dictionary.GetOrCreate(bag, create);
-
-            private Dictionary<Bag, object> Dictionary { get; }
-                = new Dictionary<Bag, object>();
-        }
-
-        private BagMap Map { get; } = new BagMap();
+        private ObservableMap Map { get; }
+            = new ObservableMap();
     }
 }

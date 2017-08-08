@@ -54,15 +54,6 @@ namespace Aliq.Adapters
             private ColdObservableAdapter Adapter { get; }
         }
 
-        private sealed class BagMap
-        {
-            public IObservable<T> GetOrCreate<T>(Bag<T> bag, Func<IObservable<T>> create)
-                => Dictionary.GetOrCreate(bag, create);
-
-            private Dictionary<Bag, object> Dictionary { get; }
-                = new Dictionary<Bag, object>();
-        }
-
-        private BagMap Map { get; } = new BagMap();
+        private ObservableMap Map { get; } = new ObservableMap();
     }
 }
