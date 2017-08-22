@@ -46,8 +46,18 @@ namespace XUnitTest
             var averageAge = azureAliqAdapter.Get(averageAgeLogic).ToArray();
 
             Assert.Equal(youth.Length, 3);
+            Assert.True(youth.Any(v => v.Name == "Deepak Shankargouda" && v.Age == 20));
+            Assert.True(youth.Any(v => v.Name == "Sergey Shandar" && v.Age == 22));
+            Assert.True(youth.Any(v => v.Name == "Mike Liu" && v.Age == 18));
+            Assert.False(youth.Any(v => v.Name == "Bob Smith" && v.Age == 31));
+            Assert.False(youth.Any(v => v.Name == "Mickey Mouse" && v.Age == 89));
+
             Assert.Equal(veterans.Length, 1);
+            Assert.True(veterans.Any(v => v.Name == "Mickey Mouse" && v.Age == 89));
+
             Assert.Equal(inBetweeners.Length, 1);
+            Assert.True(inBetweeners.Any(v => v.Name == "Bob Smith" && v.Age == 31));
+
             Assert.Equal(averageAge, new[] { 36.0 });
         }
     }
