@@ -1,22 +1,22 @@
 ﻿using Aliq.Bags;
-using Aliq.Linq;
 using System;
-using System.Collections.Generic;
 using System.Reactive.Linq;
 
 namespace Aliq.Adapters
 {
-    public sealed class ColdObservableAdapter
+    public abstract class ObservableAdapterBase<O>
+        where O : ObservableAdapterBase<O>
     {
-        public void SetInput<T>(ExternalInput<T> bag, IObservable<T> input)
-            => Map.GetOrCreate(bag, () => input);
-
         public IObservable<T> Get<T>(Bag<T> bag)
-            => Map.GetOrCreate(bag, () => bag.Accept(new CreateVisitor<T>(this)));
+            => Map.GetOrCreate(bag, () => bag.Accept(CreateCreateVisitor<T>()));
 
-        private sealed class CreateVisitor<T> : Bag<T>.IVisitor<IObservable<T>>
+        internal abstract CreateVisitorBase<T> CreateCreateVisitor<T>();
+
+        internal ObservableMap Map { get; } = new ObservableMap();
+
+        internal abstract class CreateVisitorBase<T> : Bag<T>.IVisitor<IObservable<T>>
         {
-            public CreateVisitor(ColdObservableAdapter adapter)
+            protected CreateVisitorBase(O adapter)
             {
                 Adapter = adapter;
             }
@@ -31,11 +31,8 @@ namespace Aliq.Adapters
                 return a.Merge(b);
             }
 
-            public IObservable<T> Visit(ExternalInput<T> externalInput)
-                => throw new Exception("no input");
-
-            public IObservable<T> Visit(Const<T> const_)
-                => Observable.Return(const_.Value);
+            public abstract IObservable<T> Visit(ExternalInput<T> externalInput);
+            public abstract IObservable<T> Visit(Const<T> const_);
 
             public IObservable<T> Visit<I>(GroupBy<T, I> groupBy)
                 => Adapter
@@ -51,9 +48,7 @@ namespace Aliq.Adapters
                 return a.SelectMany(ai => b.SelectMany(bi => product.Func(ai, bi)));
             }
 
-            private ColdObservableAdapter Adapter { get; }
+            protected O Adapter { get; }
         }
-
-        private ObservableMap Map { get; } = new ObservableMap();
     }
 }

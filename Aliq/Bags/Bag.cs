@@ -7,8 +7,7 @@ namespace Aliq.Bags
     public abstract class Bag
     {
         public interface IVisitor<R>
-        {
-            
+        {            
             R Visit<T>(Bag<T> bag);
         }
 
