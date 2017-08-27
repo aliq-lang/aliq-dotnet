@@ -4,8 +4,8 @@ using System.Reactive.Linq;
 
 namespace Aliq.Adapters
 {
-    public abstract class ObservableAdapterBase<A>
-        where A : ObservableAdapterBase<A>
+    public abstract class ObservableAdapterBase<O>
+        where O : ObservableAdapterBase<O>
     {
         public IObservable<T> Get<T>(Bag<T> bag)
             => Map.GetOrCreate(bag, () => bag.Accept(CreateCreateVisitor<T>()));
@@ -16,7 +16,7 @@ namespace Aliq.Adapters
 
         internal abstract class CreateVisitorBase<T> : Bag<T>.IVisitor<IObservable<T>>
         {
-            protected CreateVisitorBase(A adapter)
+            protected CreateVisitorBase(O adapter)
             {
                 Adapter = adapter;
             }
@@ -48,26 +48,7 @@ namespace Aliq.Adapters
                 return a.SelectMany(ai => b.SelectMany(bi => product.Func(ai, bi)));
             }
 
-            protected A Adapter { get; }
+            protected O Adapter { get; }
         }
-
-        /*
-        internal abstract class CreateVisitorBase<T> : Bag<T>.IVisitor<IObservable<T>>
-        {
-            public CreateVisitorBase(ObservableAdapterBase adapter)
-            {
-                Adapter = adapter;
-            }
-
-            public abstract IObservable<T> Visit<I>(SelectMany<T, I> selectMany);
-            public abstract IObservable<T> Visit(Merge<T> merge);
-            public abstract IObservable<T> Visit(ExternalInput<T> externalInput);
-            public abstract IObservable<T> Visit(Const<T> const_);
-            public abstract IObservable<T> Visit<I>(GroupBy<T, I> groupBy);
-            public abstract IObservable<T> Visit<A, B>(Product<T, A, B> product);
-
-            private ObservableAdapterBase Adapter { get; }
-        }
-        */
     }
 }
