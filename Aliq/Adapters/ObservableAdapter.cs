@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 
 namespace Aliq.Adapters
 {
-    public sealed class ObservableAdapter : ObservableAdapterBase
+    public sealed class ObservableAdapter : ObservableAdapterBase<ObservableAdapter>
     {
         public void SetInput<T>(ExternalInput<T> bag, IObservable<T> input)
             => Map.GetOrCreate(bag, () => input);
@@ -15,9 +15,8 @@ namespace Aliq.Adapters
 
         private sealed class CreateVisitor<T> : CreateVisitorBase<T>
         {
-            public CreateVisitor(ObservableAdapter adapter)
+            public CreateVisitor(ObservableAdapter adapter) : base(adapter)
             {
-                Adapter = adapter;
             }
 
             public override IObservable<T> Visit<I>(SelectMany<T, I> selectMany)
@@ -49,8 +48,6 @@ namespace Aliq.Adapters
                 var b = Adapter.Get(product.InputB);
                 return a.SelectMany(ai => b.SelectMany(bi => product.Func(ai, bi)));
             }
-
-            private ObservableAdapter Adapter { get; }
         }
     }
 }
