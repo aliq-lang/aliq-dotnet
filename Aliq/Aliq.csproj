@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DagVer" Version="0.1.0.37" PrivateAssets="All" />
+    <PackageReference Include="DagVer" Version="0.1.0.41" PrivateAssets="All" />
     <PackageReference Include="NumericPolicies" Version="0.0.16.35784" />
     <PackageReference Include="System.Reactive.Linq" Version="3.1.1" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
