@@ -32,7 +32,7 @@ namespace XUnitTest
             var aTable = Get();
 
             // back end
-            var inMemory = new ColdObservableAdapter();
+            var inMemory = new ObservableAdapter();
 
             // binding
             inMemory.SetInput(a, Get().ToObservable());
