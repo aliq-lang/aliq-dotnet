@@ -1,6 +1,6 @@
-# ALIQ
+# ALIQ for .Net
 
-Abstract Language Integrated Query
+Abstract Language Integrated Query for .Net
 
 [![NuGet](https://img.shields.io/nuget/v/Aliq.svg)](https://www.nuget.org/packages/Aliq/)
 
@@ -16,7 +16,7 @@ Implement a `Bag<T>.IVisitor` from [Aliq/Bags/Bag.cs](Aliq/Bags/Bag.cs).
 
 - Enumerable.
 - Advanced Enumerable:
-  - multi-threading (# of threads/nodes == # of processord).
+  - multi-threading (# of threads/nodes == # of processors).
   - cache tables that will be reused.
 
 ## For Developers
