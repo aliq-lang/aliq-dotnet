@@ -10,7 +10,7 @@ namespace Aliq.Adapters
     {
         public void SetInput<T>(ExternalInput<T> bag, IObservable<T> input)
         {
-            var subject = (Subject<T>)Get(bag);
+            var subject = Map.GetOrCreate(bag, () => new Subject<T>());
             StartSubject.Subscribe(_ => input.Subscribe(subject));
         }
 
@@ -30,9 +30,6 @@ namespace Aliq.Adapters
             public CreateVisitor(HotObservableAdapter adapter): base(adapter)
             {
             }
-
-            public override IObservable<T> Visit(ExternalInput<T> externalInput)
-                => new Subject<T>();
 
             public override IObservable<T> Visit(Const<T> const_)
                 => Adapter.StartSubject.Select(_ => const_.Value);

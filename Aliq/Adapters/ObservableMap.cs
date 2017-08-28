@@ -7,7 +7,7 @@ namespace Aliq.Adapters
 {
     internal sealed class ObservableMap
     {
-        public IObservable<T> GetOrCreate<T>(Bag<T> bag, Func<IObservable<T>> create)
+        public R GetOrCreate<T, R>(Bag<T> bag, Func<R> create)
             => Dictionary.GetOrCreate(bag, create);
 
         private Dictionary<Bag, object> Dictionary { get; }

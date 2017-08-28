@@ -21,6 +21,9 @@ namespace Aliq.Adapters
                 Adapter = adapter;
             }
 
+            public IObservable<T> Visit(ExternalInput<T> externalInput)
+                => throw new Exception("no input");
+
             public IObservable<T> Visit<I>(SelectMany<T, I> selectMany)
                 => Adapter.Get(selectMany.Input).SelectMany(selectMany.Func);
 
@@ -31,7 +34,6 @@ namespace Aliq.Adapters
                 return a.Merge(b);
             }
 
-            public abstract IObservable<T> Visit(ExternalInput<T> externalInput);
             public abstract IObservable<T> Visit(Const<T> const_);
 
             public IObservable<T> Visit<I>(GroupBy<T, I> groupBy)

@@ -1,5 +1,4 @@
 ﻿using Aliq.Bags;
-using Aliq.Linq;
 using System;
 using System.Reactive.Linq;
 
@@ -18,9 +17,6 @@ namespace Aliq.Adapters
             public CreateVisitor(ObservableAdapter adapter) : base(adapter)
             {
             }
-
-            public override IObservable<T> Visit(ExternalInput<T> externalInput)
-                => throw new Exception("no input");
 
             public override IObservable<T> Visit(Const<T> const_)
                 => Observable.Return(const_.Value);
