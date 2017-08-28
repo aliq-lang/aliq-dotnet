@@ -6,11 +6,11 @@ Abstract Language Integrated Query
 
 ### Creating a Business Logic Using ALIQ
 
-Use the `Bag` type and extension methods from [Aliq\Extensions.cs](Aliq\Extensions.cs).
+Use the `Bag` type and extension methods from [Aliq/Linq/Extensions.cs](Aliq/Linq/Extensions.cs).
 
 ### Creating a Back-End Which Execute the Business-Logic
 
-Implement a `Bag<T>.IVisitor` from [Aliq\Bag.cs](Aliq\Bag.cs).
+Implement a `Bag<T>.IVisitor` from [Aliq/Bags/Bag.cs](Aliq/Bags/Bag.cs).
 
 ## Back-End Examples
 
