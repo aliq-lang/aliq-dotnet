@@ -1,4 +1,4 @@
-﻿namespace Aliq
+ssss﻿namespace Aliq
 {
     public struct Void
     {
