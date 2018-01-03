@@ -21,5 +21,5 @@ Implement a `Bag<T>.IVisitor` from [Aliq/Bags/Bag.cs](Aliq/Bags/Bag.cs).
 
 ## For Developers
 
-[![Build Status](https://travis-ci.org/sergey-shandar/aliq-dotnet.svg?branch=master)](https://travis-ci.org/sergey-shandar/aliq-dotnet)
+[![Build Status](https://travis-ci.org/aliq-lang/aliq-dotnet.svg?branch=master)](https://travis-ci.org/aliq-lang/aliq-dotnet)
 [![Build status](https://ci.appveyor.com/api/projects/status/21j3blj8kuuftpo2?svg=true)](https://ci.appveyor.com/project/sergey-shandar/aliq-dotnet)
